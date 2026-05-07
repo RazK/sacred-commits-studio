@@ -6,6 +6,7 @@ import {
   bavliAmoraForChapter, yerushalmiAmoraForChapter,
   TOTAL_CHAPTERS,
 } from '../../api/sefaria';
+import type { AppView } from '../../App';
 
 // ─── Layer model ──────────────────────────────────────────────────────────────
 
@@ -87,7 +88,7 @@ function buildLayers(ch: ChapterData, chapter: number): Layer[] {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function ContributionView() {
+export default function ContributionView({ activeView, onViewChange }: { activeView: AppView; onViewChange: (v: AppView) => void }) {
   const [chapter, setChapter]         = useState(1);
   const [chapterData, setChapterData] = useState<ChapterData | null>(null);
   const [loading, setLoading]         = useState(true);
@@ -143,6 +144,21 @@ export default function ContributionView() {
             </p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
+            {/* View tabs */}
+            <div className="flex rounded-md border border-gray-200 overflow-hidden text-xs font-mono">
+              <button
+                onClick={() => onViewChange('blame')}
+                className={`px-2.5 py-1.5 transition-colors ${activeView === 'blame' ? 'bg-gray-900 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+              >
+                blame
+              </button>
+              <button
+                onClick={() => onViewChange('diff')}
+                className={`px-2.5 py-1.5 border-l border-gray-200 transition-colors ${activeView === 'diff' ? 'bg-gray-900 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+              >
+                diff
+              </button>
+            </div>
             {/* Language toggle */}
             <div className="flex rounded-md border border-gray-200 overflow-hidden text-xs font-mono">
               <button
