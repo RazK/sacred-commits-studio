@@ -18,23 +18,25 @@ interface Layer {
   sefariaUrl: string;
 }
 
+type Lang = 'en' | 'he';
+
 const ERAS = ['Tannaim', 'Amoraim', 'Rishonim'] as const;
 const PREVIEW_CHARS = 600;
 
 // ─── Build layers from a chapter's Sefaria data ───────────────────────────────
 
 function buildLayers(ch: ChapterData, chapter: number): Layer[] {
-  const rabbi    = authorById['rabbi-yehuda-hanasi'];
-  const rashi    = authorById['rashi'];
-  const tosafot  = authorById['tosafot'];
-  const bavliA   = bavliAmoraForChapter(chapter, TOTAL_CHAPTERS);
+  const rabbi       = authorById['rabbi-yehuda-hanasi'];
+  const rashi       = authorById['rashi'];
+  const tosafot     = authorById['tosafot'];
+  const bavliA      = bavliAmoraForChapter(chapter, TOTAL_CHAPTERS);
   const yerushalmiA = yerushalmiAmoraForChapter(chapter);
 
   const findCommentary = (title: string): Commentary | undefined =>
     ch.bavli?.commentary?.find(c => c.collectiveTitle?.en === title);
 
-  const gemara  = findCommentary('Gemara');
-  const rashiC  = findCommentary('Rashi');
+  const gemara   = findCommentary('Gemara');
+  const rashiC   = findCommentary('Rashi');
   const tosafotC = findCommentary('Tosafot');
 
   const candidates: (Layer | null)[] = [
@@ -86,13 +88,15 @@ function buildLayers(ch: ChapterData, chapter: number): Layer[] {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function ContributionView() {
-  const [chapter, setChapter]       = useState(1);
+  const [chapter, setChapter]         = useState(1);
   const [chapterData, setChapterData] = useState<ChapterData | null>(null);
-  const [loading, setLoading]       = useState(true);
-  const [activeEras, setActiveEras] = useState<Set<string>>(new Set(ERAS));
+  const [loading, setLoading]         = useState(true);
+  const [activeEras, setActiveEras]   = useState<Set<string>>(new Set(ERAS));
   const [activeBranches, setActiveBranches] = useState<Set<string>>(
     new Set(branches.map(b => b.id))
   );
+  const [lang, setLang]               = useState<Lang>('he');
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -127,105 +131,143 @@ export default function ContributionView() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white px-6 py-4 sticky top-0 z-10 shadow-sm">
-        <div className="mx-auto max-w-5xl flex items-baseline justify-between">
-          <div>
-            <h1 className="font-mono text-lg font-semibold text-gray-900">
+      <header className="border-b border-gray-200 bg-white px-4 py-3 sticky top-0 z-10 shadow-sm">
+        <div className="mx-auto max-w-5xl flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="font-mono text-base font-semibold text-gray-900 truncate">
               sacred-commits
-              <span className="text-gray-400 font-normal"> / Tractate Berakhot</span>
+              <span className="text-gray-400 font-normal hidden sm:inline"> / Tractate Berakhot</span>
             </h1>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-500 hidden sm:block">
               1,300 years of scholarship — visualized as Git blame
             </p>
           </div>
-          <div className="text-xs text-gray-400 font-mono">
-            {layers.length} layer{layers.length !== 1 ? 's' : ''} · Ch. {chapter} of {TOTAL_CHAPTERS}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Language toggle */}
+            <div className="flex rounded-md border border-gray-200 overflow-hidden text-xs font-mono">
+              <button
+                onClick={() => setLang('en')}
+                className={`px-2.5 py-1.5 transition-colors ${lang === 'en' ? 'bg-gray-900 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => setLang('he')}
+                className={`px-2.5 py-1.5 border-l border-gray-200 transition-colors ${lang === 'he' ? 'bg-gray-900 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+              >
+                עב
+              </button>
+            </div>
+            <span className="text-xs text-gray-400 font-mono whitespace-nowrap hidden sm:inline">
+              {layers.length} layers · Ch. {chapter}/{TOTAL_CHAPTERS}
+            </span>
           </div>
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl px-6 py-6 flex gap-6">
+      <div className="mx-auto max-w-5xl px-4 py-4 flex flex-col md:flex-row gap-4 md:gap-6">
+
         {/* Sidebar */}
-        <aside className="w-52 flex-shrink-0 space-y-6">
+        <aside className="md:w-52 md:flex-shrink-0">
+
+          {/* Chapter list — pills on mobile, vertical list on desktop */}
           <div>
             <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">
               Chapter
             </h2>
-            <div className="space-y-0.5">
+            <div className="flex flex-wrap gap-1 md:flex-col md:gap-0 md:space-y-0.5">
               {Array.from({ length: TOTAL_CHAPTERS }, (_, i) => i + 1).map(n => (
                 <button
                   key={n}
                   onClick={() => setChapter(n)}
-                  className={`w-full text-left px-3 py-1.5 rounded text-sm font-mono transition-colors ${
+                  className={`px-2.5 py-1 rounded text-sm font-mono transition-colors md:w-full md:text-left md:px-3 md:py-1.5 ${
                     chapter === n
                       ? 'bg-gray-900 text-white'
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  Chapter {n}
+                  <span className="md:hidden">{n}</span>
+                  <span className="hidden md:inline">Chapter {n}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          <div>
-            <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">
-              Era
-            </h2>
-            <div className="space-y-1.5">
-              {ERAS.map(era => (
-                <label key={era} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={activeEras.has(era)}
-                    onChange={() => toggleEra(era)}
-                    className="rounded border-gray-300 text-gray-900 focus:ring-0"
-                  />
-                  <span className="text-sm text-gray-700">{era}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+          {/* Filters — collapsible on mobile */}
+          <div className="mt-4 md:mt-6 md:space-y-6">
+            <button
+              className="flex items-center w-full text-xs font-mono uppercase tracking-wider text-gray-400 md:hidden"
+              onClick={() => setFiltersOpen(o => !o)}
+            >
+              <span>Filters</span>
+              <span className="ml-auto">{filtersOpen ? '▲' : '▼'}</span>
+            </button>
 
-          <div>
-            <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">
-              Tradition
-            </h2>
-            <div className="space-y-1.5">
-              {branches.map(b => (
-                <label key={b.id} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={activeBranches.has(b.id)}
-                    onChange={() => toggleBranch(b.id)}
-                    className="rounded border-gray-300 focus:ring-0"
-                    style={{ accentColor: b.color }}
-                  />
-                  <span className="flex items-center gap-1.5 text-sm text-gray-700">
-                    <span
-                      className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: b.color }}
-                    />
-                    {b.display_name.split(' (')[0]}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
+            <div className={`${filtersOpen ? 'block' : 'hidden'} md:block space-y-4 md:space-y-6 mt-2 md:mt-0`}>
+              {/* Era filters */}
+              <div>
+                <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">
+                  Era
+                </h2>
+                <div className="space-y-1.5">
+                  {ERAS.map(era => (
+                    <label key={era} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={activeEras.has(era)}
+                        onChange={() => toggleEra(era)}
+                        className="rounded border-gray-300 text-gray-900 focus:ring-0"
+                      />
+                      <span className="text-sm text-gray-700">{era}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
 
-          <div>
-            <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">
-              Git metaphor
-            </h2>
-            <ul className="space-y-1 text-xs text-gray-500">
-              <li><span className="font-mono">commit</span> = scholarly contribution</li>
-              <li><span className="font-mono">branch</span> = textual tradition</li>
-              <li><span className="font-mono">author</span> = historical rabbi</li>
-              <li><span className="font-mono">diff</span> = Bavli vs. Yerushalmi</li>
-            </ul>
+              {/* Branch / tradition filters */}
+              <div>
+                <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">
+                  Tradition
+                </h2>
+                <div className="space-y-1.5">
+                  {branches.map(b => (
+                    <label key={b.id} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={activeBranches.has(b.id)}
+                        onChange={() => toggleBranch(b.id)}
+                        className="rounded border-gray-300 focus:ring-0"
+                        style={{ accentColor: b.color }}
+                      />
+                      <span className="flex items-center gap-1.5 text-sm text-gray-700">
+                        <span
+                          className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: b.color }}
+                        />
+                        {b.display_name.split(' (')[0]}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Legend — desktop only */}
+              <div className="hidden md:block">
+                <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">
+                  Git metaphor
+                </h2>
+                <ul className="space-y-1 text-xs text-gray-500">
+                  <li><span className="font-mono">commit</span> = scholarly contribution</li>
+                  <li><span className="font-mono">branch</span> = textual tradition</li>
+                  <li><span className="font-mono">author</span> = historical rabbi</li>
+                  <li><span className="font-mono">diff</span> = Bavli vs. Yerushalmi</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </aside>
 
+        {/* Main content */}
         <main className="flex-1 min-w-0">
           {!sefariaAvailable ? (
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-sm text-amber-800">
@@ -252,6 +294,7 @@ export default function ContributionView() {
                   key={layer.branchId}
                   layer={layer}
                   branch={branchById[layer.branchId]}
+                  lang={lang}
                 />
               ))}
             </div>
@@ -264,27 +307,28 @@ export default function ContributionView() {
 
 // ─── Layer card ───────────────────────────────────────────────────────────────
 
-function LayerCard({ layer, branch }: { layer: Layer; branch: Branch }) {
-  const [expanded, setExpanded]   = useState(false);
+function LayerCard({ layer, branch, lang }: { layer: Layer; branch: Branch; lang: Lang }) {
+  const [expanded, setExpanded]       = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const { author } = layer;
 
-  const enPreview = expanded ? layer.textEn : layer.textEn.slice(0, PREVIEW_CHARS);
-  const hePreview = expanded ? layer.textHe : layer.textHe.slice(0, PREVIEW_CHARS);
-  const truncated = layer.textEn.length > PREVIEW_CHARS || layer.textHe.length > PREVIEW_CHARS;
+  const activeText = lang === 'he' ? layer.textHe : layer.textEn;
+  const preview    = expanded ? activeText : activeText.slice(0, PREVIEW_CHARS);
+  const truncated  = activeText.length > PREVIEW_CHARS;
 
   return (
     <article
       className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden"
       style={{ borderLeftWidth: 4, borderLeftColor: branch.color }}
     >
-      <div className="flex items-start justify-between px-5 py-3 border-b border-gray-100 bg-gray-50/50">
-        <div className="flex items-start gap-3">
+      {/* Author / branch header */}
+      <div className="flex items-start justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/50">
+        <div className="flex items-start gap-3 min-w-0">
           <div
             className="w-3 h-3 rounded-full mt-1 flex-shrink-0"
             style={{ backgroundColor: author.color }}
           />
-          <div>
+          <div className="min-w-0">
             <p className="font-mono text-[11px] uppercase tracking-wider text-gray-400">
               {layer.label}
             </p>
@@ -293,6 +337,7 @@ function LayerCard({ layer, branch }: { layer: Layer; branch: Branch }) {
                 className="font-semibold text-sm text-gray-900 hover:underline underline-offset-2"
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
+                onClick={() => setShowTooltip(v => !v)}
                 type="button"
               >
                 {author.name}
@@ -302,8 +347,8 @@ function LayerCard({ layer, branch }: { layer: Layer; branch: Branch }) {
               )}
               <span className="text-gray-300">·</span>
               <span className="text-gray-500 text-xs">{author.active_years[0]} CE</span>
-              <span className="text-gray-300">·</span>
-              <span className="text-gray-500 text-xs">{author.location}</span>
+              <span className="text-gray-300 hidden sm:inline">·</span>
+              <span className="text-gray-500 text-xs hidden sm:inline">{author.location}</span>
             </div>
           </div>
         </div>
@@ -311,40 +356,42 @@ function LayerCard({ layer, branch }: { layer: Layer; branch: Branch }) {
           href={layer.sefariaUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-blue-500 hover:text-blue-700 mt-1 flex-shrink-0"
+          className="text-xs text-blue-500 hover:text-blue-700 mt-1 flex-shrink-0 ml-2"
         >
-          Sefaria ↗
+          ↗
         </a>
       </div>
 
+      {/* Tooltip */}
       {showTooltip && <AuthorTooltip author={author} branch={branch} />}
 
-      <div className="px-5 py-4 space-y-3">
-        {layer.textHe && (
-          <p dir="rtl" className="text-gray-700 leading-loose text-sm font-serif">
-            {hePreview}{!expanded && truncated ? '…' : ''}
-          </p>
-        )}
-        {layer.textEn && (
-          <p className="text-gray-600 leading-relaxed text-sm">
-            {enPreview}{!expanded && truncated ? '…' : ''}
-          </p>
-        )}
-        {!layer.textEn && !layer.textHe && (
+      {/* Text — one language at a time */}
+      <div className="px-4 py-4">
+        {activeText ? (
+          <>
+            <p
+              dir={lang === 'he' ? 'rtl' : undefined}
+              className={`text-sm leading-loose ${lang === 'he' ? 'font-serif text-gray-700' : 'text-gray-600 leading-relaxed'}`}
+            >
+              {preview}{!expanded && truncated ? '…' : ''}
+            </p>
+            {truncated && (
+              <button
+                onClick={() => setExpanded(e => !e)}
+                className="mt-2 text-xs text-blue-500 hover:text-blue-700"
+                type="button"
+              >
+                {expanded ? 'Show less' : 'Show full text'}
+              </button>
+            )}
+          </>
+        ) : (
           <p className="text-gray-400 text-sm italic">Text not available for this layer.</p>
-        )}
-        {truncated && (
-          <button
-            onClick={() => setExpanded(e => !e)}
-            className="text-xs text-blue-500 hover:text-blue-700"
-            type="button"
-          >
-            {expanded ? 'Show less' : 'Show full text'}
-          </button>
         )}
       </div>
 
-      <div className="px-5 py-2 border-t border-gray-100 bg-gray-50/50 flex items-center gap-3">
+      {/* Commit-style footer */}
+      <div className="px-4 py-2 border-t border-gray-100 bg-gray-50/50 flex items-center gap-3">
         <span
           className="font-mono text-[10px] px-1.5 py-0.5 rounded"
           style={{ backgroundColor: branch.color + '22', color: branch.color }}
@@ -364,7 +411,7 @@ function LayerCard({ layer, branch }: { layer: Layer; branch: Branch }) {
 
 function AuthorTooltip({ author, branch }: { author: Author; branch: Branch }) {
   return (
-    <div className="mx-5 mb-2 rounded-md border border-gray-200 bg-white p-3 text-xs shadow-md">
+    <div className="mx-4 mb-2 rounded-md border border-gray-200 bg-white p-3 text-xs shadow-md">
       <div className="flex items-center gap-2 mb-2">
         <div
           className="w-2.5 h-2.5 rounded-full flex-shrink-0"
