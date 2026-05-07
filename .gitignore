@@ -2,7 +2,9 @@ node_modules/
 dist/
 
 # Sefaria API cache — regenerate with npm run fetch
-data/sefaria/
+# Use * instead of / so exceptions below can override
+data/sefaria/*
+!data/sefaria/berakhot-ch1.json
 
 # Generated mock-repo data — regenerate with npm run generate
 data/mock-repo/commits.json
