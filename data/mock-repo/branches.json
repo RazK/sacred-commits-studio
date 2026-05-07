@@ -1,0 +1,80 @@
+{
+  "branches": [
+    {
+      "id": "main",
+      "name": "main",
+      "display_name": "Mishna (Original)",
+      "description": "The foundational text of the Oral Torah, compiled by Rabbi Yehuda HaNasi around 200 CE. This is the root from which all branches derive.",
+      "diverged_from": null,
+      "divergence_year": null,
+      "origin_location": "Beit She'arim, Land of Israel",
+      "language": "Mishnaic Hebrew",
+      "color": "#1A3A5C",
+      "status": "root"
+    },
+    {
+      "id": "bavli",
+      "name": "bavli",
+      "display_name": "Babylonian Talmud (Bavli)",
+      "description": "The more widely studied of the two Talmuds, compiled in the Babylonian academies (primarily Sura and Pumbedita) and redacted around 500–600 CE. The halakha generally follows the Bavli.",
+      "diverged_from": "main",
+      "divergence_year": 220,
+      "origin_location": "Babylonia (modern Iraq)",
+      "primary_academies": ["Sura", "Pumbedita", "Nehardea", "Mahoza"],
+      "language": "Jewish Babylonian Aramaic + Hebrew",
+      "redaction_completed": 600,
+      "color": "#8B4513",
+      "status": "active",
+      "manuscript": {
+        "name": "Munich Manuscript (Cod. Hebr. 95)",
+        "date": 1343,
+        "location": "Bavarian State Library, Munich",
+        "note": "The only complete manuscript of the Babylonian Talmud"
+      }
+    },
+    {
+      "id": "yerushalmi",
+      "name": "yerushalmi",
+      "display_name": "Jerusalem Talmud (Yerushalmi)",
+      "description": "The earlier Talmud, compiled in the academies of the Land of Israel (primarily Tiberias and Caesarea) around 350–400 CE. Shorter and often considered less edited than the Bavli.",
+      "diverged_from": "main",
+      "divergence_year": 220,
+      "origin_location": "Tiberias and Caesarea, Land of Israel",
+      "primary_academies": ["Tiberias", "Caesarea", "Sepphoris"],
+      "language": "Jewish Palestinian Aramaic + Hebrew",
+      "redaction_completed": 400,
+      "color": "#228B22",
+      "status": "active",
+      "manuscript": {
+        "name": "Leiden Manuscript (Cod. Or. 4720)",
+        "date": 1289,
+        "location": "Leiden University Library",
+        "note": "The only complete manuscript of the Jerusalem Talmud"
+      }
+    },
+    {
+      "id": "rashi-commentary",
+      "name": "rashi-commentary",
+      "display_name": "Rashi Commentary Layer",
+      "description": "Rashi's commentary (11th century, France) is not a separate version of the text but an annotation layer applied primarily to the Bavli. Represented here as a branch to visualize its contributions.",
+      "diverged_from": "bavli",
+      "divergence_year": 1060,
+      "origin_location": "Troyes, France",
+      "language": "Medieval Hebrew + Old French glosses",
+      "color": "#8B0000",
+      "status": "annotation-layer"
+    },
+    {
+      "id": "tosafot-commentary",
+      "name": "tosafot-commentary",
+      "display_name": "Tosafot Commentary Layer",
+      "description": "Critical glosses by the Tosafists (12th–13th century, France and Germany), often responding directly to Rashi's commentary.",
+      "diverged_from": "rashi-commentary",
+      "divergence_year": 1100,
+      "origin_location": "France and Germany",
+      "language": "Medieval Hebrew",
+      "color": "#B22222",
+      "status": "annotation-layer"
+    }
+  ]
+}

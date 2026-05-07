@@ -81,6 +81,16 @@ npm run dev         # Vite dev server on :5173
 npm run build       # Production build
 ```
 
+### generate-repo.js output path
+
+The script writes a real Git repo to a configurable location:
+
+```bash
+node scripts/generate-repo.js /path/to/output
+OUTPUT_PATH=/path/to/output npm run generate
+# defaults to ../sacred-commits-product
+```
+
 ---
 
 ## Coding Rules
