@@ -1,0 +1,10 @@
+node_modules/
+dist/
+
+# Sefaria API cache — regenerate with npm run fetch
+data/sefaria/
+
+# Generated mock-repo data — regenerate with npm run generate
+data/mock-repo/commits.json
+data/mock-repo/diffs.json
+data/mock-repo/stats.json
