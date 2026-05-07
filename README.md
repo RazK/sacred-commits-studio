@@ -1,19 +1,29 @@
-# Sacred Commits
+# Sacred Commits Studio
 
-> A Git-inspired platform for visualizing how ancient texts were written, branched, and debated across centuries — starting with the Talmud.
+> The development studio for [Sacred Commits](https://github.com/razk/sacred-commits) — a Git-inspired platform for visualizing how ancient texts were written, branched, and debated across centuries.
 
-**Sacred Commits** reimagines ancient collaborative texts as version-controlled codebases — scholars as contributors, commentaries as commits, textual traditions as branches, and interpretive disputes as merge conflicts.
+## Quick Start
 
-The platform launches with the Talmud (Mishna + Gemara), with a vision to expand to any ancient text with a complex transmission history: the Torah, the New Testament, the Quran, the Iliad, and beyond.
+```bash
+npm install
+npm run fetch      # Pull Tractate Berakhot from Sefaria API
+npm run generate   # Generate the sacred-commits product repo
+npm run dev        # Start the visualization app on :5173
+```
 
-## Quick Links
+## What This Does
 
-- [Product Requirements Document](./PRD.md)
+`npm run generate` produces a real Git repository where:
+- Each commit is authored by a historical rabbi with a real `--author` and `--date`
+- `main` branch = the Mishna (~200 CE, Rabbi Yehuda HaNasi)
+- `bavli` branch = Babylonian Talmud (~220–500 CE)
+- `yerushalmi` branch = Jerusalem Talmud (~220–400 CE)
+- `rashi-commentary` branch = Rashi's glosses (~1080 CE)
+- `tosafot-commentary` branch = Tosafist critical notes (~1150–1300 CE)
 
-## Status
+Run `git log --all --oneline --graph` in the output repo to see 1,300 years of scholarship.
 
-🚧 Early development — Phase 1 (data layer) complete
+## See Also
 
-## License
-
-Talmud data sourced from [Sefaria](https://www.sefaria.org) under CC BY-NC 4.0.
+- [PRD.md](PRD.md) — product vision and requirements
+- [CLAUDE.md](CLAUDE.md) — operational guide for Claude Code

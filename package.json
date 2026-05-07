@@ -1,7 +1,7 @@
 {
-  "name": "sacred-commits",
+  "name": "sacred-commits-studio",
   "version": "0.1.0",
-  "description": "A Git-inspired platform for visualizing how ancient texts were written, branched, and debated across centuries — starting with the Talmud.",
+  "description": "Development studio for Sacred Commits — a Git-inspired platform for visualizing how ancient texts evolved across centuries.",
   "scripts": {
     "fetch": "node scripts/sefaria-client.js",
     "generate": "node scripts/generate-repo.js",
@@ -29,6 +29,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/sacred-commits"
+    "url": "https://github.com/razk/sacred-commits-studio"
   }
 }
