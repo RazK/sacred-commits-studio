@@ -1,0 +1,35 @@
+{
+  "ref": "Berakhot.1",
+  "chapter": 1,
+  "bavli": {
+    "text": [
+      "From when may one recite the evening <i>Shema</i>? From the time the priests enter to partake of their <i>teruma</i>, until the end of the first watch. This is the statement of Rabbi Eliezer. The Rabbis say: Until midnight. Rabban Gamliel says: Until dawn. It once happened that Rabban Gamliel's sons came home from a feast after midnight. They said to him: We have not yet recited the <i>Shema</i>. He said to them: If dawn has not yet appeared, you are still obligated to recite it.",
+      "And not only this, but wherever the Sages said until midnight, the obligation remains until dawn. The burning of the fats and limbs may be performed until dawn; and any sacrifice that must be eaten that day may be eaten until dawn. If so, why did the Sages say until midnight? To distance a person from transgression."
+    ],
+    "he": [
+      "מֵאֵימָתַי קורִין אֶת שְׁמַע בְּעַרְבִית? מִשָּׁעָה שֶׁהַכֹּהֲנִים נִכְנָסִין לֶאֱכֹל בִּתְרוּמָתָן עַד סוֹף הָאַשְׁמוּרָה הָרִאשׁוֹנָה, דִּבְרֵי רַבִּי אֱלִיעֶזֶר. וַחֲכָמִים אוֹמְרִים עַד חֲצוֹת. רַבָּן גַּמְלִיאֵל אוֹמֵר עַד שֶׁיַּעֲלֶה עַמּוּד הַשַּׁחַר. מַעֲשֶׂה שֶׁבָּאוּ בָנָיו מִבֵּית הַמִּשְׁתֶּה, אָמְרוּ לוֹ לֹא קָרִינוּ אֶת שְׁמַע, אָמַר לָהֶם אִם לֹא עָלָה עַמּוּד הַשַּׁחַר חַיָּבִין אַתֶּם לִקְרוֹת.",
+      "וְלֹא זוֹ בִלְבַד, אֶלָּא כָּל מַה שֶׁאָמְרוּ חֲכָמִים עַד חֲצוֹת — מִצְוָתָן עַד שֶׁיַּעֲלֶה עַמּוּד הַשַּׁחַר. הֶקְטֵר חֲלָבִים וְאֵבָרִים — מִצְוָתָן עַד שֶׁיַּעֲלֶה עַמּוּד הַשַּׁחַר. אִם כֵּן, לָמָּה אָמְרוּ חֲכָמִים עַד חֲצוֹת? כְּדֵי לְהַרְחִיק אָדָם מִן הָעֲבֵרָה."
+    ],
+    "commentary": [
+      {
+        "collectiveTitle": { "en": "Gemara", "he": "גמרא" },
+        "text": "The Gemara asks: What is the reason the <i>tanna</i> taught the laws of the evening <i>Shema</i> before those of the morning <i>Shema</i>? The Gemara answers: The <i>tanna</i> derives his sequence from the verse: \"And there was evening and there was morning, one day\" (Genesis 1:5), which teaches that evening precedes morning.\n\nThe Master said in the mishna: From the time the priests enter to partake of their <i>teruma</i>. The Gemara asks: Why does the <i>tanna</i> cite the entry of the priests as the determining criterion? Let him simply say: From nightfall.\n\nThe Gemara answers: The <i>tanna</i> teaches us incidentally that the priests may partake of their <i>teruma</i> at nightfall, and that one does not require the emergence of stars — the setting of the sun alone marks the beginning of the night.",
+        "he": "מַאִי טַעְמָא תָּנָא עַרְבִית בְּרֵישׁ? אִיבָּעֵית אֵימָא, תַּנָּא אַקְרָא קָאֵי, דִּכְתִיב: וַיְהִי עֶרֶב וַיְהִי בֹקֶר יוֹם אֶחָד, תָּנָא בְּרֵישׁ עַרְבִית.\n\nוְלֵיתְנֵי: מֵאֵימַת לֵילְיָא? מִלְּתָא אַגַּב אוֹרְחֵיהּ קָא מַשְׁמַע לַן: כֹּהֲנִים אֵימַת קָאָכְלֵי בִּתְרוּמָה? מִשְׁקִיעַת הַחַמָּה."
+      },
+      {
+        "collectiveTitle": { "en": "Rashi", "he": "רש\"י" },
+        "text": "From when the priests enter — A priest who became ritually impure must immerse in a ritual bath and then wait for nightfall. At nightfall his purification is complete and he may partake of his <i>teruma</i>. Therefore the entry of priests to eat <i>teruma</i> marks nightfall.\n\nUntil the end of the first watch — Rabbi Eliezer maintains that the night is divided into three watches. The end of the first watch is thus one-third of the night, approximately four hours after nightfall.\n\nUntil midnight — The Sages decreed a fence around the law so that one would not delay past midnight and accidentally miss the obligation altogether.",
+        "he": "משעה שהכהנים נכנסין — כהן שנטמא טובל וצריך הערב שמש, ומשעת הערב שמש אוכל בתרומה. ושקיעת החמה היא תחילת הלילה.\n\nעד סוף האשמורה הראשונה — סבר רבי אליעזר שלש אשמורות הוי הלילה, נמצא סוף אשמורה ראשונה כשליש הלילה.\n\nעד חצות — גזרו חכמים גדר כדי שלא יבוא אדם לידי ביטול מצות קריאת שמע לגמרי."
+      },
+      {
+        "collectiveTitle": { "en": "Tosafot", "he": "תוספות" },
+        "text": "Why does the Mishna not simply say 'from nightfall' rather than 'from when the priests enter'? Tosafot explain: By mentioning the priests, the Mishna teaches an additional halakha — that a priest who immersed on that day need not wait for the stars to emerge but may eat <i>teruma</i> immediately at sunset. This ruling was disputed, as some hold that one must wait for three stars to appear.\n\nFurthermore, Tosafot note that Rabban Gamliel's ruling — that the time extends until dawn — is the accepted halakha, as codified by Rambam and the Shulchan Aruch.",
+        "he": "ולמה לא קתני משחשכה — שמעינן מינה שאין צריך להמתין לצאת הכוכבים אלא בשקיעת החמה ממש אוכל בתרומה. ויש חולקים וסוברים שצריך שלשה כוכבים.\n\nעוד, הלכה כרבן גמליאל שמצותה כל הלילה עד שיעלה עמוד השחר, וכן פסק הרמבהם בהלכות קריאת שמע."
+      }
+    ]
+  },
+  "yerushalmi": {
+    "text": "From when may one recite the evening Shema? From when the priests are sanctified to eat of their teruma. Rabbi Eliezer says: until the end of the first watch. The Sages say: until midnight. Rabban Shimon ben Gamliel says: until the rise of dawn.\n\nWhat constitutes the first watch? Rabbi Eliezer says: three hours of the night. Rabbi Shmuel bar Nachmani said in the name of Rabbi Yonatan: The night is divided into three watches, and corresponding to each watch the Holy Blessed One sits and roars like a lion.\n\nRabbi Yose bar Avin said: Why does the Mishna teach the laws of the evening Shema before those of the morning Shema? Because it is written: And there was evening and there was morning.",
+    "he": "מאימתי קורין את שמע בערבית? משיקדשו הכהנים לאכול בתרומתן. רבי אליעזר אומר עד סוף אשמורה ראשונה. וחכמים אומרים עד חצות. רבן שמעון בן גמליאל אומר עד שיעלה עמוד השחר.\n\nמהיא אשמורה ראשונה? רבי אליעזר אומר שלש שעות של לילה. רבי שמואל בר נחמני בשם רבי יונתן: שלש אשמורות הוי הלילה, וכנגד כל אשמורה ואשמורה הקדוש ברוך הוא יושב ושואג כארי.\n\nרבי יוסה בן אבין אמר: למה שנינו ערבית תחילה? שכן כתוב ויהי ערב ויהי בקר."
+  }
+}
