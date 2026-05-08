@@ -7,13 +7,27 @@ import {
 } from '../../api/sefaria';
 import type { AppView } from '../../App';
 
-// ─── Word-level diff ──────────────────────────────────────────────────────────
+// ─── Word-level diff ──────────────────────────────────────────────────────────────
 
 type DiffType = 'equal' | 'insert' | 'delete';
 interface Seg { type: DiffType; text: string }
 
 function tokenize(s: string): string[] {
   return s.match(/\S+|\s+/g) ?? [];
+}
+
+function hasNikud(s: string): boolean {
+  return /[ְ-ׇ]/.test(s);
+}
+
+function stripNikud(s: string): string {
+  return s.replace(/[֑-ׇ]/g, '');
+}
+
+function tokensEqual(a: string, b: string): boolean {
+  if (a === b) return true;
+  if (hasNikud(a) && hasNikud(b)) return false;
+  return stripNikud(a) === stripNikud(b);
 }
 
 function wordDiff(left: string, right: string): { leftSegs: Seg[]; rightSegs: Seg[] } {
@@ -31,14 +45,14 @@ function wordDiff(left: string, right: string): { leftSegs: Seg[]; rightSegs: Se
   const dp: number[][] = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
   for (let i = 1; i <= m; i++)
     for (let j = 1; j <= n; j++)
-      dp[i][j] = a[i-1] === b[j-1]
+      dp[i][j] = tokensEqual(a[i-1], b[j-1])
         ? dp[i-1][j-1] + 1
         : Math.max(dp[i-1][j], dp[i][j-1]);
 
   const segs: Seg[] = [];
   let i = m, j = n;
   while (i > 0 || j > 0) {
-    if (i > 0 && j > 0 && a[i-1] === b[j-1]) {
+    if (i > 0 && j > 0 && tokensEqual(a[i-1], b[j-1])) {
       segs.unshift({ type: 'equal', text: a[i-1] }); i--; j--;
     } else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) {
       segs.unshift({ type: 'insert', text: b[j-1] }); j--;
@@ -68,7 +82,7 @@ function buildPairs(leftFull: string, rightFull: string): ParaPair[] {
   });
 }
 
-// ─── Highlighted diff text ────────────────────────────────────────────────────
+// ─── Highlighted diff text ──────────────────────────────────────────────────────
 
 function DiffText({ segs, side, rtl }: { segs: Seg[]; side: 'left' | 'right'; rtl: boolean }) {
   return (
@@ -85,7 +99,7 @@ function DiffText({ segs, side, rtl }: { segs: Seg[]; side: 'left' | 'right'; rt
   );
 }
 
-// ─── Branch header card ───────────────────────────────────────────────────────
+// ─── Branch header card ───────────────────────────────────────────────────────────
 
 function BranchHeader({ branch, author, label, sefariaUrl }: {
   branch: Branch; author: Author; label: string; sefariaUrl: string;
@@ -122,7 +136,7 @@ function BranchHeader({ branch, author, label, sefariaUrl }: {
   );
 }
 
-// ─── Paragraph cell ───────────────────────────────────────────────────────────
+// ─── Paragraph cell ───────────────────────────────────────────────────────────────
 
 function ParaCell({ segs, side, rtl, empty, color }: {
   segs: Seg[]; side: 'left' | 'right'; rtl: boolean; empty: boolean; color: string;
@@ -141,7 +155,7 @@ function ParaCell({ segs, side, rtl, empty, color }: {
   );
 }
 
-// ─── Main DiffView ────────────────────────────────────────────────────────────
+// ─── Main DiffView ──────────────────────────────────────────────────────────────
 
 type Lang = 'en' | 'he';
 
