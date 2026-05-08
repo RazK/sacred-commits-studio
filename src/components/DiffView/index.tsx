@@ -84,7 +84,7 @@ function buildPairs(leftFull: string, rightFull: string): ParaPair[] {
 
 // ─── Highlighted diff text ──────────────────────────────────────────────────────
 
-function DiffText({ segs, side, rtl }: { segs: Seg[]; side: 'left' | 'right'; rtl: boolean }) {
+function DiffText({ segs, side }: { segs: Seg[]; side: 'left' | 'right' }) {
   return (
     <span>
       {segs.map((seg, i) => {
@@ -150,7 +150,7 @@ function ParaCell({ segs, side, rtl, empty, color }: {
       style={{ borderLeftWidth: 2, borderLeftColor: color + '88' }}
       dir={rtl ? 'rtl' : undefined}
     >
-      <DiffText segs={segs} side={side} rtl={rtl} />
+      <DiffText segs={segs} side={side} />
     </div>
   );
 }
