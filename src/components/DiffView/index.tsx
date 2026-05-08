@@ -7,7 +7,7 @@ import {
 } from '../../api/sefaria';
 import type { AppView } from '../../App';
 
-// ─── Word-level diff ──────────────────────────────────────────────────────────────
+// ─── Word-level diff ──────────────────────────────────────────────────────────
 
 type DiffType = 'equal' | 'insert' | 'delete';
 interface Seg { type: DiffType; text: string }
@@ -68,7 +68,7 @@ function buildPairs(leftFull: string, rightFull: string): ParaPair[] {
   });
 }
 
-// ─── Highlighted diff text ──────────────────────────────────────────────────────
+// ─── Highlighted diff text ────────────────────────────────────────────────────
 
 function DiffText({ segs, side, rtl }: { segs: Seg[]; side: 'left' | 'right'; rtl: boolean }) {
   return (
@@ -85,28 +85,25 @@ function DiffText({ segs, side, rtl }: { segs: Seg[]; side: 'left' | 'right'; rt
   );
 }
 
-// ─── Branch header card ───────────────────────────────────────────────────────────
+// ─── Branch header card ───────────────────────────────────────────────────────
 
 function BranchHeader({ branch, author, label, sefariaUrl }: {
   branch: Branch; author: Author; label: string; sefariaUrl: string;
 }) {
   return (
     <div
-      className="rounded-lg border border-gray-200 bg-white px-4 py-3"
+      className="rounded-lg border border-gray-200 bg-white px-3 py-2"
       style={{ borderLeftWidth: 4, borderLeftColor: branch.color }}
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: branch.color }} />
-          <div className="min-w-0">
-            <p className="font-mono text-[10px] uppercase tracking-wider text-gray-400 truncate">{label}</p>
-            <p className="text-sm font-semibold text-gray-800">{author.name}</p>
-            <p className="text-xs text-gray-500">{author.active_years[0]} CE · {author.location}</p>
-          </div>
+      <div className="flex items-start justify-between gap-1">
+        <div className="min-w-0 flex-1">
+          <p className="font-mono text-[9px] uppercase tracking-wider text-gray-400 truncate">{label}</p>
+          <p className="text-sm font-semibold text-gray-800 truncate">{author.name}</p>
+          <p className="text-xs text-gray-500 truncate">{author.active_years[0]} CE</p>
         </div>
         <div className="flex flex-col items-end gap-1 flex-shrink-0">
           <span
-            className="font-mono text-[10px] px-1.5 py-0.5 rounded"
+            className="font-mono text-[9px] px-1 py-0.5 rounded whitespace-nowrap"
             style={{ backgroundColor: branch.color + '22', color: branch.color }}
           >
             {branch.name}
@@ -117,7 +114,7 @@ function BranchHeader({ branch, author, label, sefariaUrl }: {
             rel="noopener noreferrer"
             className="text-[10px] text-blue-500 hover:text-blue-700"
           >
-            Sefaria ↗
+            ↗
           </a>
         </div>
       </div>
@@ -125,7 +122,7 @@ function BranchHeader({ branch, author, label, sefariaUrl }: {
   );
 }
 
-// ─── Paragraph cell ───────────────────────────────────────────────────────────────
+// ─── Paragraph cell ───────────────────────────────────────────────────────────
 
 function ParaCell({ segs, side, rtl, empty, color }: {
   segs: Seg[]; side: 'left' | 'right'; rtl: boolean; empty: boolean; color: string;
@@ -144,7 +141,7 @@ function ParaCell({ segs, side, rtl, empty, color }: {
   );
 }
 
-// ─── Main DiffView ──────────────────────────────────────────────────────────────
+// ─── Main DiffView ────────────────────────────────────────────────────────────
 
 type Lang = 'en' | 'he';
 
