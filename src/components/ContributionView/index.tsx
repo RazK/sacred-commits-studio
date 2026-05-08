@@ -6,7 +6,8 @@ import {
   bavliAmoraForChapter, yerushalmiAmoraForChapter,
   TOTAL_CHAPTERS,
 } from '../../api/sefaria';
-import type { AppView } from '../../App';
+import type { AppView, Lang } from '../../App';
+import { AppShell } from '../AppShell';
 import { FilePathHeader } from '../FilePathHeader';
 
 // ─── Layer model ──────────────────────────────────────────────────────────────
@@ -20,12 +21,10 @@ interface Layer {
   sefariaUrl: string;
 }
 
-type Lang = 'en' | 'he';
-
 const ERAS = ['Tannaim', 'Amoraim', 'Rishonim'] as const;
 const PREVIEW_CHARS = 600;
 
-// ─── Build layers from a chapter's Sefaria data ───────────────────────────────────────
+// ─── Build layers ──────────────────────────────────────────────────────────────
 
 function buildLayers(ch: ChapterData, chapter: number): Layer[] {
   const rabbi       = authorById['rabbi-yehuda-hanasi'];
@@ -87,9 +86,14 @@ function buildLayers(ch: ChapterData, chapter: number): Layer[] {
   return candidates.filter((l): l is Layer => l !== null);
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────────
+// ─── Main component ──────────────────────────────────────────────────────────────
 
-export default function ContributionView({ activeView, onViewChange }: { activeView: AppView; onViewChange: (v: AppView) => void }) {
+export default function ContributionView({
+  activeView, onViewChange, lang, onLangChange,
+}: {
+  activeView: AppView; onViewChange: (v: AppView) => void;
+  lang: Lang; onLangChange: (l: Lang) => void;
+}) {
   const [chapter, setChapter]         = useState(1);
   const [chapterData, setChapterData] = useState<ChapterData | null>(null);
   const [loading, setLoading]         = useState(true);
@@ -97,7 +101,6 @@ export default function ContributionView({ activeView, onViewChange }: { activeV
   const [activeBranches, setActiveBranches] = useState<Set<string>>(
     new Set(branches.map(b => b.id))
   );
-  const [lang, setLang]               = useState<Lang>('he');
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
@@ -130,199 +133,131 @@ export default function ContributionView({ activeView, onViewChange }: { activeV
     });
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white px-4 py-3 sticky top-0 z-10 shadow-sm">
-        <div className="mx-auto max-w-5xl flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="font-mono text-base font-semibold text-gray-900 truncate">
-              sacred-commits
-            </h1>
-            <p className="text-xs text-gray-500">
-              Tractate Berakhot · מסכת ברכות
-            </p>
+  const sidebar = (
+    <>
+      {/* Chapter list */}
+      <div>
+        <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">Chapter</h2>
+        <div className="flex flex-wrap gap-1 md:flex-col md:gap-0 md:space-y-0.5">
+          {Array.from({ length: TOTAL_CHAPTERS }, (_, i) => i + 1).map(n => (
+            <button
+              key={n}
+              onClick={() => setChapter(n)}
+              className={`px-2.5 py-1 rounded text-sm font-mono transition-colors md:w-full md:text-left md:px-3 md:py-1.5 ${
+                chapter === n ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <span className="md:hidden">{n}</span>
+              <span className="hidden md:inline">Chapter {n}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="mt-4 md:mt-6 md:space-y-6">
+        <button
+          className="flex items-center w-full text-xs font-mono uppercase tracking-wider text-gray-400 md:hidden"
+          onClick={() => setFiltersOpen(o => !o)}
+        >
+          <span>Filters</span>
+          <span className="ml-auto">{filtersOpen ? '▲' : '▼'}</span>
+        </button>
+        <div className={`${filtersOpen ? 'block' : 'hidden'} md:block space-y-4 md:space-y-6 mt-2 md:mt-0`}>
+          <div>
+            <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">Era</h2>
+            <div className="space-y-1.5">
+              {ERAS.map(era => (
+                <label key={era} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={activeEras.has(era)}
+                    onChange={() => toggleEra(era)}
+                    className="rounded border-gray-300 text-gray-900 focus:ring-0"
+                  />
+                  <span className="text-sm text-gray-700">{era}</span>
+                </label>
+              ))}
+            </div>
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {/* View tabs */}
-            <div className="flex rounded-md border border-gray-200 overflow-hidden text-xs font-mono">
-              <button
-                onClick={() => onViewChange('blame')}
-                className={`px-2.5 py-1.5 transition-colors ${activeView === 'blame' ? 'bg-gray-900 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
-              >
-                blame
-              </button>
-              <button
-                onClick={() => onViewChange('diff')}
-                className={`px-2.5 py-1.5 border-l border-gray-200 transition-colors ${activeView === 'diff' ? 'bg-gray-900 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
-              >
-                diff
-              </button>
+          <div>
+            <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">Tradition</h2>
+            <div className="space-y-1.5">
+              {branches.map(b => (
+                <label key={b.id} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={activeBranches.has(b.id)}
+                    onChange={() => toggleBranch(b.id)}
+                    className="rounded border-gray-300 focus:ring-0"
+                    style={{ accentColor: b.color }}
+                  />
+                  <span className="flex items-center gap-1.5 text-sm text-gray-700">
+                    <span className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: b.color }} />
+                    {b.display_name.split(' (')[0]}
+                  </span>
+                </label>
+              ))}
             </div>
-            {/* Language toggle */}
-            <div className="flex rounded-md border border-gray-200 overflow-hidden text-xs font-mono">
-              <button
-                onClick={() => setLang('en')}
-                className={`px-2.5 py-1.5 transition-colors ${lang === 'en' ? 'bg-gray-900 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
-              >
-                EN
-              </button>
-              <button
-                onClick={() => setLang('he')}
-                className={`px-2.5 py-1.5 border-l border-gray-200 transition-colors ${lang === 'he' ? 'bg-gray-900 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
-              >
-                עב
-              </button>
-            </div>
-            <span className="text-xs text-gray-400 font-mono whitespace-nowrap hidden sm:inline">
-              {layers.length} layers · Ch. {chapter}/{TOTAL_CHAPTERS}
-            </span>
+          </div>
+          <div className="hidden md:block">
+            <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">Git metaphor</h2>
+            <ul className="space-y-1 text-xs text-gray-500">
+              <li><span className="font-mono">commit</span> = scholarly contribution</li>
+              <li><span className="font-mono">branch</span> = textual tradition</li>
+              <li><span className="font-mono">author</span> = historical rabbi</li>
+              <li><span className="font-mono">diff</span> = Bavli vs. Yerushalmi</li>
+            </ul>
           </div>
         </div>
-      </header>
-
-      <div className="mx-auto max-w-5xl px-4 py-4 flex flex-col md:flex-row gap-4 md:gap-6">
-
-        {/* Sidebar */}
-        <aside className="md:w-52 md:flex-shrink-0">
-
-          {/* Chapter list — pills on mobile, vertical list on desktop */}
-          <div>
-            <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">
-              Chapter
-            </h2>
-            <div className="flex flex-wrap gap-1 md:flex-col md:gap-0 md:space-y-0.5">
-              {Array.from({ length: TOTAL_CHAPTERS }, (_, i) => i + 1).map(n => (
-                <button
-                  key={n}
-                  onClick={() => setChapter(n)}
-                  className={`px-2.5 py-1 rounded text-sm font-mono transition-colors md:w-full md:text-left md:px-3 md:py-1.5 ${
-                    chapter === n
-                      ? 'bg-gray-900 text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <span className="md:hidden">{n}</span>
-                  <span className="hidden md:inline">Chapter {n}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Filters — collapsible on mobile */}
-          <div className="mt-4 md:mt-6 md:space-y-6">
-            <button
-              className="flex items-center w-full text-xs font-mono uppercase tracking-wider text-gray-400 md:hidden"
-              onClick={() => setFiltersOpen(o => !o)}
-            >
-              <span>Filters</span>
-              <span className="ml-auto">{filtersOpen ? '▲' : '▼'}</span>
-            </button>
-
-            <div className={`${filtersOpen ? 'block' : 'hidden'} md:block space-y-4 md:space-y-6 mt-2 md:mt-0`}>
-              {/* Era filters */}
-              <div>
-                <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">
-                  Era
-                </h2>
-                <div className="space-y-1.5">
-                  {ERAS.map(era => (
-                    <label key={era} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={activeEras.has(era)}
-                        onChange={() => toggleEra(era)}
-                        className="rounded border-gray-300 text-gray-900 focus:ring-0"
-                      />
-                      <span className="text-sm text-gray-700">{era}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Branch / tradition filters */}
-              <div>
-                <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">
-                  Tradition
-                </h2>
-                <div className="space-y-1.5">
-                  {branches.map(b => (
-                    <label key={b.id} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={activeBranches.has(b.id)}
-                        onChange={() => toggleBranch(b.id)}
-                        className="rounded border-gray-300 focus:ring-0"
-                        style={{ accentColor: b.color }}
-                      />
-                      <span className="flex items-center gap-1.5 text-sm text-gray-700">
-                        <span
-                          className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: b.color }}
-                        />
-                        {b.display_name.split(' (')[0]}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Legend — desktop only */}
-              <div className="hidden md:block">
-                <h2 className="font-mono text-xs uppercase tracking-wider text-gray-400 mb-2">
-                  Git metaphor
-                </h2>
-                <ul className="space-y-1 text-xs text-gray-500">
-                  <li><span className="font-mono">commit</span> = scholarly contribution</li>
-                  <li><span className="font-mono">branch</span> = textual tradition</li>
-                  <li><span className="font-mono">author</span> = historical rabbi</li>
-                  <li><span className="font-mono">diff</span> = Bavli vs. Yerushalmi</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        {/* Main content */}
-        <main className="flex-1 min-w-0">
-          {!sefariaAvailable ? (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-sm text-amber-800">
-              <p className="font-mono font-semibold mb-1">No text data found</p>
-              <p>
-                Run <code className="bg-amber-100 px-1 rounded font-mono">npm run fetch</code>{' '}
-                to pull Talmudic text from the Sefaria API, then restart the dev server.
-              </p>
-            </div>
-          ) : loading ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="rounded-lg border border-gray-200 bg-white h-40 animate-pulse" />
-              ))}
-            </div>
-          ) : visibleLayers.length === 0 ? (
-            <p className="text-sm text-gray-400 font-mono">
-              No layers match current filters.
-            </p>
-          ) : (
-            <div className="space-y-4">
-              <FilePathHeader chapter={chapter} />
-              {visibleLayers.map(layer => (
-                <LayerCard
-                  key={layer.branchId}
-                  layer={layer}
-                  branch={branchById[layer.branchId]}
-                  lang={lang}
-                />
-              ))}
-            </div>
-          )}
-        </main>
       </div>
-    </div>
+    </>
+  );
+
+  return (
+    <AppShell
+      activeView={activeView}
+      onViewChange={onViewChange}
+      lang={lang}
+      onLangChange={onLangChange}
+      subtitle="Tractate Berakhot · מסכת ברכות"
+      info={`${layers.length} layers · Ch. ${chapter}/${TOTAL_CHAPTERS}`}
+      sidebar={sidebar}
+    >
+      {!sefariaAvailable ? (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-sm text-amber-800">
+          <p className="font-mono font-semibold mb-1">No text data found</p>
+          <p>
+            Run <code className="bg-amber-100 px-1 rounded font-mono">npm run fetch</code>{' '}
+            to pull Talmudic text from the Sefaria API, then restart the dev server.
+          </p>
+        </div>
+      ) : loading ? (
+        <div className="space-y-4">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="rounded-lg border border-gray-200 bg-white h-40 animate-pulse" />
+          ))}
+        </div>
+      ) : visibleLayers.length === 0 ? (
+        <p className="text-sm text-gray-400 font-mono">No layers match current filters.</p>
+      ) : (
+        <div className="space-y-4">
+          <FilePathHeader chapter={chapter} />
+          {visibleLayers.map(layer => (
+            <LayerCard
+              key={layer.branchId}
+              layer={layer}
+              branch={branchById[layer.branchId]}
+              lang={lang}
+            />
+          ))}
+        </div>
+      )}
+    </AppShell>
   );
 }
 
-// ─── Layer card ───────────────────────────────────────────────────────────────
+// ─── Layer card ──────────────────────────────────────────────────────────────
 
 function LayerCard({ layer, branch, lang }: { layer: Layer; branch: Branch; lang: Lang }) {
   const [expanded, setExpanded]       = useState(false);
@@ -338,17 +273,11 @@ function LayerCard({ layer, branch, lang }: { layer: Layer; branch: Branch; lang
       className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden"
       style={{ borderLeftWidth: 4, borderLeftColor: branch.color }}
     >
-      {/* Author / branch header */}
       <div className="flex items-start justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/50">
         <div className="flex items-start gap-3 min-w-0">
-          <div
-            className="w-3 h-3 rounded-full mt-1 flex-shrink-0"
-            style={{ backgroundColor: author.color }}
-          />
+          <div className="w-3 h-3 rounded-full mt-1 flex-shrink-0" style={{ backgroundColor: author.color }} />
           <div className="min-w-0">
-            <p className="font-mono text-[11px] uppercase tracking-wider text-gray-400">
-              {layer.label}
-            </p>
+            <p className="font-mono text-[11px] uppercase tracking-wider text-gray-400">{layer.label}</p>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5">
               <button
                 className="font-semibold text-sm text-gray-900 hover:underline underline-offset-2"
@@ -359,9 +288,7 @@ function LayerCard({ layer, branch, lang }: { layer: Layer; branch: Branch; lang
               >
                 {author.name}
               </button>
-              {author.hebrew && (
-                <span dir="rtl" className="text-gray-500 text-xs">{author.hebrew}</span>
-              )}
+              {author.hebrew && <span dir="rtl" className="text-gray-500 text-xs">{author.hebrew}</span>}
               <span className="text-gray-300">·</span>
               <span className="text-gray-500 text-xs">{author.active_years[0]} CE</span>
               <span className="text-gray-300 hidden sm:inline">·</span>
@@ -369,20 +296,12 @@ function LayerCard({ layer, branch, lang }: { layer: Layer; branch: Branch; lang
             </div>
           </div>
         </div>
-        <a
-          href={layer.sefariaUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-blue-500 hover:text-blue-700 mt-1 flex-shrink-0 ml-2"
-        >
-          ↗
-        </a>
+        <a href={layer.sefariaUrl} target="_blank" rel="noopener noreferrer"
+           className="text-xs text-blue-500 hover:text-blue-700 mt-1 flex-shrink-0 ml-2">↗</a>
       </div>
 
-      {/* Tooltip */}
       {showTooltip && <AuthorTooltip author={author} branch={branch} />}
 
-      {/* Text — one language at a time */}
       <div className="px-4 py-4">
         {activeText ? (
           <>
@@ -393,11 +312,7 @@ function LayerCard({ layer, branch, lang }: { layer: Layer; branch: Branch; lang
               {preview}{!expanded && truncated ? '…' : ''}
             </p>
             {truncated && (
-              <button
-                onClick={() => setExpanded(e => !e)}
-                className="mt-2 text-xs text-blue-500 hover:text-blue-700"
-                type="button"
-              >
+              <button onClick={() => setExpanded(e => !e)} className="mt-2 text-xs text-blue-500 hover:text-blue-700" type="button">
                 {expanded ? 'Show less' : 'Show full text'}
               </button>
             )}
@@ -407,64 +322,39 @@ function LayerCard({ layer, branch, lang }: { layer: Layer; branch: Branch; lang
         )}
       </div>
 
-      {/* Commit-style footer */}
       <div className="px-4 py-2 border-t border-gray-100 bg-gray-50/50 flex items-center gap-3">
-        <span
-          className="font-mono text-[10px] px-1.5 py-0.5 rounded"
-          style={{ backgroundColor: branch.color + '22', color: branch.color }}
-        >
+        <span className="font-mono text-[10px] px-1.5 py-0.5 rounded"
+              style={{ backgroundColor: branch.color + '22', color: branch.color }}>
           {branch.name}
         </span>
         <span className="font-mono text-[10px] text-gray-400">{author.era}</span>
-        <span className="font-mono text-[10px] text-gray-400">
-          {author.born}–{author.died} CE
-        </span>
+        <span className="font-mono text-[10px] text-gray-400">{author.born}–{author.died} CE</span>
       </div>
     </article>
   );
 }
 
-// ─── Author tooltip ───────────────────────────────────────────────────────────────
+// ─── Author tooltip ─────────────────────────────────────────────────────────────
 
 function AuthorTooltip({ author, branch }: { author: Author; branch: Branch }) {
   return (
     <div className="mx-4 mb-2 rounded-md border border-gray-200 bg-white p-3 text-xs shadow-md">
       <div className="flex items-center gap-2 mb-2">
-        <div
-          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-          style={{ backgroundColor: author.color }}
-        />
+        <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: author.color }} />
         <span className="font-semibold text-gray-900">{author.name}</span>
-        {author.hebrew && (
-          <span dir="rtl" className="text-gray-500">{author.hebrew}</span>
-        )}
+        {author.hebrew && <span dir="rtl" className="text-gray-500">{author.hebrew}</span>}
       </div>
       <table className="w-full mb-2 text-gray-600">
         <tbody>
-          <tr>
-            <td className="text-gray-400 pr-3 py-0.5">Role</td>
-            <td>{author.role}</td>
-          </tr>
-          <tr>
-            <td className="text-gray-400 pr-3 py-0.5">Era</td>
-            <td>{author.era}</td>
-          </tr>
-          <tr>
-            <td className="text-gray-400 pr-3 py-0.5">Active</td>
-            <td>{author.active_years[0]}–{author.active_years[1]} CE</td>
-          </tr>
-          <tr>
-            <td className="text-gray-400 pr-3 py-0.5">Location</td>
-            <td>{author.location}</td>
-          </tr>
+          <tr><td className="text-gray-400 pr-3 py-0.5">Role</td><td>{author.role}</td></tr>
+          <tr><td className="text-gray-400 pr-3 py-0.5">Era</td><td>{author.era}</td></tr>
+          <tr><td className="text-gray-400 pr-3 py-0.5">Active</td><td>{author.active_years[0]}–{author.active_years[1]} CE</td></tr>
+          <tr><td className="text-gray-400 pr-3 py-0.5">Location</td><td>{author.location}</td></tr>
           <tr>
             <td className="text-gray-400 pr-3 py-0.5">Tradition</td>
             <td>
               <span className="inline-flex items-center gap-1">
-                <span
-                  className="w-2 h-2 rounded-full inline-block"
-                  style={{ backgroundColor: branch.color }}
-                />
+                <span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: branch.color }} />
                 {branch.display_name}
               </span>
             </td>
