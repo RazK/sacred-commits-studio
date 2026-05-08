@@ -101,9 +101,22 @@ function DiffText({ segs, side }: { segs: Seg[]; side: 'left' | 'right' }) {
 
 // ─── Branch header card ───────────────────────────────────────────────────────────
 
+const CHAPTER_NAMES: Record<number, { he: string; en: string }> = {
+  1: { he: 'מֵאֵימָתַי', en: 'From when' },
+  2: { he: 'הָיָה קוֹרֵא', en: 'One who reads' },
+  3: { he: 'מִי שֶּמֵתוֹ', en: 'One whose dead' },
+  4: { he: 'תְּפִלַּת הַשַּּחַר', en: 'Morning prayer' },
+  5: { he: 'אֵין עוֹמְדִין', en: 'One may not stand' },
+  6: { he: 'כֵּיצַד מְבָרְכִין', en: 'How one blesses' },
+  7: { he: 'שְּלֹשָּה שֶּאָכְלוּ', en: 'Three who ate' },
+  8: { he: 'אֵלּוּ דְבָרִים', en: 'These are the matters' },
+  9: { he: 'הָרוֹאֶה', en: 'One who sees' },
+};
+
 function BranchHeader({ branch, author, label, sefariaUrl }: {
   branch: Branch; author: Author; label: string; sefariaUrl: string;
 }) {
+  const aka = (author as Author & { aka?: string[] }).aka?.[0];
   return (
     <div
       className="rounded-lg border border-gray-200 bg-white px-3 py-2"
@@ -112,8 +125,9 @@ function BranchHeader({ branch, author, label, sefariaUrl }: {
       <div className="flex items-start justify-between gap-1">
         <div className="min-w-0 flex-1">
           <p className="font-mono text-[9px] uppercase tracking-wider text-gray-400 truncate">{label}</p>
-          <p className="text-sm font-semibold text-gray-800 truncate">{author.name}</p>
-          <p className="text-xs text-gray-500 truncate">{author.active_years[0]} CE</p>
+          <p className="text-sm font-semibold text-gray-800 leading-tight">{author.name}</p>
+          {aka && <p className="text-[10px] text-gray-400 leading-tight">{aka}</p>}
+          <p className="text-xs text-gray-500">{author.active_years[0]} CE</p>
         </div>
         <div className="flex flex-col items-end gap-1 flex-shrink-0">
           <span
@@ -326,6 +340,14 @@ export default function DiffView({ activeView, onViewChange }: { activeView: App
                 <div className="mb-3 flex items-center gap-3 font-mono text-xs text-gray-500">
                   <span className="text-red-600">−{deletions} Bavli-only</span>
                   <span className="text-green-600">+{insertions} Yerushalmi-only</span>
+                </div>
+              )}
+
+              {CHAPTER_NAMES[chapter] && (
+                <div className="mb-3">
+                  <p className="text-xs text-gray-400 font-mono">Tractate Berakhot · Chapter {chapter}</p>
+                  <p className="text-base font-semibold text-gray-800" dir="rtl">{CHAPTER_NAMES[chapter].he}</p>
+                  <p className="text-xs text-gray-500 italic">"{CHAPTER_NAMES[chapter].en}…"</p>
                 </div>
               )}
 
