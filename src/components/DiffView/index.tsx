@@ -5,6 +5,7 @@ import {
   bavliAmoraForChapter, yerushalmiAmoraForChapter,
   TOTAL_CHAPTERS,
 } from '../../api/sefaria';
+import { FilePathHeader } from '../FilePathHeader';
 import type { AppView } from '../../App';
 
 // ─── Word-level diff ──────────────────────────────────────────────────────────────
@@ -100,18 +101,6 @@ function DiffText({ segs, side }: { segs: Seg[]; side: 'left' | 'right' }) {
 }
 
 // ─── Branch header card ───────────────────────────────────────────────────────────
-
-const CHAPTER_NAMES: Record<number, { he: string; en: string }> = {
-  1: { he: 'מֵאֵימָתַי', en: 'From when' },
-  2: { he: 'הָיָה קוֹרֵא', en: 'One who reads' },
-  3: { he: 'מִי שֶּמֵתוֹ', en: 'One whose dead' },
-  4: { he: 'תְּפִלַּת הַשַּּחַר', en: 'Morning prayer' },
-  5: { he: 'אֵין עוֹמְדִין', en: 'One may not stand' },
-  6: { he: 'כֵּיצַד מְבָרְכִין', en: 'How one blesses' },
-  7: { he: 'שְּלֹשָּה שֶּאָכְלוּ', en: 'Three who ate' },
-  8: { he: 'אֵלּוּ דְבָרִים', en: 'These are the matters' },
-  9: { he: 'הָרוֹאֶה', en: 'One who sees' },
-};
 
 function BranchHeader({ branch, author, label, sefariaUrl }: {
   branch: Branch; author: Author; label: string; sefariaUrl: string;
@@ -343,13 +332,7 @@ export default function DiffView({ activeView, onViewChange }: { activeView: App
                 </div>
               )}
 
-              {CHAPTER_NAMES[chapter] && (
-                <div className="mb-3">
-                  <p className="text-xs text-gray-400 font-mono">Tractate Berakhot · Chapter {chapter}</p>
-                  <p className="text-base font-semibold text-gray-800" dir="rtl">{CHAPTER_NAMES[chapter].he}</p>
-                  <p className="text-xs text-gray-500 italic">"{CHAPTER_NAMES[chapter].en}…"</p>
-                </div>
-              )}
+              <FilePathHeader chapter={chapter} />
 
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <BranchHeader

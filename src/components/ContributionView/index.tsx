@@ -7,6 +7,7 @@ import {
   TOTAL_CHAPTERS,
 } from '../../api/sefaria';
 import type { AppView } from '../../App';
+import { FilePathHeader } from '../FilePathHeader';
 
 // ─── Layer model ──────────────────────────────────────────────────────────────
 
@@ -304,6 +305,7 @@ export default function ContributionView({ activeView, onViewChange }: { activeV
             </p>
           ) : (
             <div className="space-y-4">
+              <FilePathHeader chapter={chapter} />
               {visibleLayers.map(layer => (
                 <LayerCard
                   key={layer.branchId}
