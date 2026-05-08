@@ -24,7 +24,7 @@ type Lang = 'en' | 'he';
 const ERAS = ['Tannaim', 'Amoraim', 'Rishonim'] as const;
 const PREVIEW_CHARS = 600;
 
-// ─── Build layers from a chapter's Sefaria data ───────────────────────────────
+// ─── Build layers from a chapter's Sefaria data ───────────────────────────────────────
 
 function buildLayers(ch: ChapterData, chapter: number): Layer[] {
   const rabbi       = authorById['rabbi-yehuda-hanasi'];
@@ -86,7 +86,7 @@ function buildLayers(ch: ChapterData, chapter: number): Layer[] {
   return candidates.filter((l): l is Layer => l !== null);
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// ─── Main component ───────────────────────────────────────────────────────────────
 
 export default function ContributionView({ activeView, onViewChange }: { activeView: AppView; onViewChange: (v: AppView) => void }) {
   const [chapter, setChapter]         = useState(1);
@@ -137,10 +137,9 @@ export default function ContributionView({ activeView, onViewChange }: { activeV
           <div className="min-w-0">
             <h1 className="font-mono text-base font-semibold text-gray-900 truncate">
               sacred-commits
-              <span className="text-gray-400 font-normal hidden sm:inline"> / Tractate Berakhot</span>
             </h1>
-            <p className="text-xs text-gray-500 hidden sm:block">
-              1,300 years of scholarship — visualized as Git blame
+            <p className="text-xs text-gray-500">
+              Tractate Berakhot · מסכת ברכות
             </p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -423,7 +422,7 @@ function LayerCard({ layer, branch, lang }: { layer: Layer; branch: Branch; lang
   );
 }
 
-// ─── Author tooltip ───────────────────────────────────────────────────────────
+// ─── Author tooltip ───────────────────────────────────────────────────────────────
 
 function AuthorTooltip({ author, branch }: { author: Author; branch: Branch }) {
   return (
