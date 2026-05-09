@@ -48,6 +48,12 @@ export function AppShell({
               >
                 log
               </button>
+              <button
+                onClick={() => onViewChange('graph')}
+                className={`px-2.5 py-1.5 border-l border-gray-200 transition-colors ${activeView === 'graph' ? 'bg-gray-900 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+              >
+                graph
+              </button>
             </div>
             <div className="flex rounded-md border border-gray-200 overflow-hidden text-xs font-mono">
               <button
