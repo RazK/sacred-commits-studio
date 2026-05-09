@@ -172,17 +172,23 @@ export default function DiffView({
   const yerushalmiAuthor  = yerushalmiAmoraForChapter(chapter);
   const rtl               = lang === 'he';
 
-  // Collapse both sides into a single paragraph so the LCS word-diff runs once
-  // across the full texts. This finds shared Mishna vocabulary naturally:
-  // equal tokens = text both traditions share, red = Bavli-only, green = Yerushalmi-only.
-  // Splitting by \n\n and re-aligning by position was wrong: Bavli §2 would be
-  // paired against Yerushalmi Gemara §1 — completely unrelated passages.
+  // Use the Bavli Gemara discussion (from commentary) vs the full Yerushalmi text.
+  // This is the true apples-to-apples: both are the scholarly Talmudic analysis
+  // of the same Mishna chapter. bavli.he contains the raw Mishna text but its
+  // structure from the live API varies by chapter (empty arrays, cumulative content),
+  // making it unreliable. The Gemara commentary is consistently structured.
+  // Collapse both into one block for a single LCS diff across the full text.
   const collapse = (t: SefariaText | null | undefined) =>
     flatten(t).split('\n\n').filter(Boolean).join(' ');
 
-  const leftText  = useMemo(() =>
-    chapterData ? collapse(rtl ? chapterData.bavli?.he    : chapterData.bavli?.text)    : '',
-    [chapterData, rtl]);
+  const leftText = useMemo(() => {
+    if (!chapterData) return '';
+    const gemara = chapterData.bavli?.commentary?.find(c => c.collectiveTitle?.en === 'Gemara');
+    if (gemara) return collapse(rtl ? gemara.he : gemara.text);
+    // fallback to main text if no Gemara commentary available
+    return collapse(rtl ? chapterData.bavli?.he : chapterData.bavli?.text);
+  }, [chapterData, rtl]);
+
   const rightText = useMemo(() =>
     chapterData ? collapse(rtl ? chapterData.yerushalmi?.he : chapterData.yerushalmi?.text) : '',
     [chapterData, rtl]);
@@ -250,7 +256,7 @@ export default function DiffView({
       onViewChange={onViewChange}
       lang={lang}
       onLangChange={onLangChange}
-      subtitle="Bavli vs. Yerushalmi — textual diff"
+      subtitle="Bavli Gemara vs. Yerushalmi — textual diff"
       sidebar={sidebar}
     >
       {!sefariaAvailable ? (
@@ -280,9 +286,9 @@ export default function DiffView({
           <FilePathHeader chapter={chapter} />
 
           <div className="grid grid-cols-2 gap-3 mb-3">
-            <BranchHeader branch={bavliBranch} author={bavliAuthor} label="Babylonian Talmud"
+            <BranchHeader branch={bavliBranch} author={bavliAuthor} label="Bavli — Gemara"
                           sefariaUrl={`https://www.sefaria.org/Berakhot.${chapter}`} />
-            <BranchHeader branch={yerushalamiBranch} author={yerushalmiAuthor} label="Jerusalem Talmud"
+            <BranchHeader branch={yerushalamiBranch} author={yerushalmiAuthor} label="Yerushalmi"
                           sefariaUrl={`https://www.sefaria.org/Jerusalem_Talmud_Berakhot.${chapter}`} />
           </div>
 
