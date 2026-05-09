@@ -93,6 +93,25 @@ OUTPUT_PATH=/path/to/output npm run generate
 
 ---
 
+## Git Workflow — MANDATORY
+
+**Never push directly to `main`.** Every change goes through a PR branch with a Vercel preview URL.
+
+1. Create a feature branch: `git checkout -b claude/<short-description>-<random-suffix>`
+2. Develop and commit on that branch
+3. Push with `git push -u origin <branch-name>`
+4. Open a PR — Vercel will build a dedicated preview URL for it
+5. Only merge to `main` after review
+
+The remote for this repo is managed via the `mcp__github__push_files` tool when local push is unavailable. Use the branch specified in your session instructions, or create one following the naming pattern above.
+
+**Violation examples (never do these):**
+- `git push origin main`
+- `mcp__github__push_files` targeting `main` directly
+- Amending commits already pushed to a shared branch
+
+---
+
 ## Coding Rules
 
 - **TypeScript everywhere** in `src/` — no plain `.js`
