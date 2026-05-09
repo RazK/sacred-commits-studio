@@ -172,9 +172,15 @@ export default function DiffView({
   const yerushalmiAuthor  = yerushalmiAmoraForChapter(chapter);
   const rtl               = lang === 'he';
 
-  const leftText  = useMemo(() =>
-    chapterData ? flatten(rtl ? chapterData.bavli?.he : chapterData.bavli?.text) : '',
-    [chapterData, rtl]);
+  // The Bavli Mishna spans multiple §§ but the Yerushalmi starts with its single
+  // Mishna paragraph then continues with Yerushalmi Gemara. Collapsing the Bavli
+  // §§ into one block means buildPairs aligns the full Bavli Mishna against the
+  // Yerushalmi Mishna (para 0), and Yerushalmi Gemara paras show as right-only.
+  const leftText  = useMemo(() => {
+    if (!chapterData) return '';
+    return flatten(rtl ? chapterData.bavli?.he : chapterData.bavli?.text)
+      .split('\n\n').filter(Boolean).join(' ');
+  }, [chapterData, rtl]);
   const rightText = useMemo(() =>
     chapterData ? flatten(rtl ? chapterData.yerushalmi?.he : chapterData.yerushalmi?.text) : '',
     [chapterData, rtl]);
