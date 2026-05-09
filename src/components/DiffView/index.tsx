@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
-  Author, Branch, ChapterData,
+  Author, Branch, ChapterData, SefariaText,
   branchById, flatten, loadChapter, sefariaAvailable,
   bavliAmoraForChapter, yerushalmiAmoraForChapter,
   TOTAL_CHAPTERS,
@@ -172,17 +172,19 @@ export default function DiffView({
   const yerushalmiAuthor  = yerushalmiAmoraForChapter(chapter);
   const rtl               = lang === 'he';
 
-  // The Bavli Mishna spans multiple §§ but the Yerushalmi starts with its single
-  // Mishna paragraph then continues with Yerushalmi Gemara. Collapsing the Bavli
-  // §§ into one block means buildPairs aligns the full Bavli Mishna against the
-  // Yerushalmi Mishna (para 0), and Yerushalmi Gemara paras show as right-only.
-  const leftText  = useMemo(() => {
-    if (!chapterData) return '';
-    return flatten(rtl ? chapterData.bavli?.he : chapterData.bavli?.text)
-      .split('\n\n').filter(Boolean).join(' ');
-  }, [chapterData, rtl]);
+  // Collapse both sides into a single paragraph so the LCS word-diff runs once
+  // across the full texts. This finds shared Mishna vocabulary naturally:
+  // equal tokens = text both traditions share, red = Bavli-only, green = Yerushalmi-only.
+  // Splitting by \n\n and re-aligning by position was wrong: Bavli §2 would be
+  // paired against Yerushalmi Gemara §1 — completely unrelated passages.
+  const collapse = (t: SefariaText | null | undefined) =>
+    flatten(t).split('\n\n').filter(Boolean).join(' ');
+
+  const leftText  = useMemo(() =>
+    chapterData ? collapse(rtl ? chapterData.bavli?.he    : chapterData.bavli?.text)    : '',
+    [chapterData, rtl]);
   const rightText = useMemo(() =>
-    chapterData ? flatten(rtl ? chapterData.yerushalmi?.he : chapterData.yerushalmi?.text) : '',
+    chapterData ? collapse(rtl ? chapterData.yerushalmi?.he : chapterData.yerushalmi?.text) : '',
     [chapterData, rtl]);
 
   const pairs = useMemo(() =>
