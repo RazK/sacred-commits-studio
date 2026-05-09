@@ -1,3 +1,4 @@
 {
+  "buildCommand": "npm run fetch && npm run build",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

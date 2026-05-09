@@ -136,3 +136,19 @@ export function yerushalmiAmoraForChapter(chapter: number): Author {
     .sort((a, b) => (a.generation ?? 99) - (b.generation ?? 99)) as unknown as Author[];
   return pool[chapter % pool.length];
 }
+
+// ─── Chapter metadata ─────────────────────────────────────────────────────────
+
+export interface ChapterMeta { he: string; en: string; slug: string }
+
+export const CHAPTER_NAMES: Record<number, ChapterMeta> = {
+  1: { he: 'מֵאֵימָתַי',        en: 'From when',             slug: 'meimatai' },
+  2: { he: 'הָיָה קוֹרֵא',      en: 'One who reads',         slug: 'haya-korei' },
+  3: { he: 'מִי שֶּׁמֵתוֹ',     en: 'One whose dead',        slug: 'mi-shemeto' },
+  4: { he: 'תְּפִלַּת הַשַּׁחַר', en: 'Morning prayer',        slug: 'tefilat-hashachar' },
+  5: { he: 'אֵין עוֹמְדִין',     en: 'One may not stand',     slug: 'ein-omdin' },
+  6: { he: 'כֵּיצַד מְבָרְכִין', en: 'How one blesses',       slug: 'keitzad-mevarkhim' },
+  7: { he: 'שְּּלֹשָׁה שֶּׁאָכְלוּ', en: 'Three who ate',        slug: 'shlosha-sheakhlu' },
+  8: { he: 'אֵלּוּ דְבָרִים',    en: 'These are the matters', slug: 'elu-devarim' },
+  9: { he: 'הָרוֹאֶה',           en: 'One who sees',          slug: 'haroeh' },
+};
