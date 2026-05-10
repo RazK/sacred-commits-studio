@@ -3,8 +3,8 @@ dist/
 
 # Sefaria API cache — fetched at build time by Vercel (npm run fetch)
 # Large aggregate files not needed in repo
-data/sefaria/berakhot-all.json
-data/sefaria/berakhot-index.json
+data/sefaria/sukkah-all.json
+data/sefaria/sukkah-index.json
 
 # Generated mock-repo data — regenerate with npm run generate
 data/mock-repo/commits.json

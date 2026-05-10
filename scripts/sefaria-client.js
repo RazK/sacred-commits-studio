@@ -13,8 +13,8 @@ const path = require('path');
 const BASE_URL = 'https://www.sefaria.org/api';
 const OUTPUT_DIR = path.join(__dirname, '../data/sefaria');
 
-// Tractate Berakhot has 9 chapters
-const BERAKHOT_CHAPTERS = 9;
+// Tractate Sukkah has 5 chapters
+const SUKKAH_CHAPTERS = 5;
 
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -34,7 +34,7 @@ async function fetchPassage(ref) {
 }
 
 async function fetchYerushalmiPassage(ref) {
-  const yerushalmiRef = ref.replace('Berakhot', 'Jerusalem Talmud Berakhot');
+  const yerushalmiRef = ref.replace('Sukkah', 'Jerusalem Talmud Sukkah');
   const encoded = encodeURIComponent(yerushalmiRef);
   const url = `${BASE_URL}/texts/${encoded}?context=0&language=both`;
   console.log(`  Fetching Yerushalmi: ${yerushalmiRef}`);
@@ -47,8 +47,8 @@ async function fetchYerushalmiPassage(ref) {
 }
 
 async function fetchIndex() {
-  const url = `${BASE_URL}/index/Berakhot`;
-  console.log('Fetching Berakhot index...');
+  const url = `${BASE_URL}/index/Sukkah`;
+  console.log('Fetching Sukkah index...');
   return fetchJSON(url);
 }
 
@@ -57,16 +57,16 @@ async function main() {
 
   const index = await fetchIndex();
   fs.writeFileSync(
-    path.join(OUTPUT_DIR, 'berakhot-index.json'),
+    path.join(OUTPUT_DIR, 'sukkah-index.json'),
     JSON.stringify(index, null, 2)
   );
-  console.log('Saved berakhot-index.json\n');
+  console.log('Saved sukkah-index.json\n');
 
   const allPassages = [];
 
-  for (let chapter = 1; chapter <= BERAKHOT_CHAPTERS; chapter++) {
+  for (let chapter = 1; chapter <= SUKKAH_CHAPTERS; chapter++) {
     console.log(`Chapter ${chapter}...`);
-    const ref = `Berakhot.${chapter}`;
+    const ref = `Sukkah.${chapter}`;
     try {
       const bavli = await fetchPassage(ref);
       // 300ms between requests — Sefaria is rate-limited, do not remove
@@ -78,17 +78,17 @@ async function main() {
       allPassages.push(passage);
 
       fs.writeFileSync(
-        path.join(OUTPUT_DIR, `berakhot-ch${chapter}.json`),
+        path.join(OUTPUT_DIR, `sukkah-ch${chapter}.json`),
         JSON.stringify(passage, null, 2)
       );
-      console.log(`  Saved berakhot-ch${chapter}.json`);
+      console.log(`  Saved sukkah-ch${chapter}.json`);
     } catch (e) {
       console.error(`  Error fetching chapter ${chapter}: ${e.message}`);
     }
   }
 
   fs.writeFileSync(
-    path.join(OUTPUT_DIR, 'berakhot-all.json'),
+    path.join(OUTPUT_DIR, 'sukkah-all.json'),
     JSON.stringify(allPassages, null, 2)
   );
 

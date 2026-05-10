@@ -256,7 +256,7 @@ export default function DiffView({
       onViewChange={onViewChange}
       lang={lang}
       onLangChange={onLangChange}
-      subtitle="Bavli Gemara vs. Yerushalmi — textual diff"
+      subtitle="Tractate Sukkah · Bavli vs. Yerushalmi — textual diff"
       sidebar={sidebar}
     >
       {!sefariaAvailable ? (
@@ -287,9 +287,9 @@ export default function DiffView({
 
           <div className="grid grid-cols-2 gap-3 mb-3">
             <BranchHeader branch={bavliBranch} author={bavliAuthor} label="Bavli — Gemara"
-                          sefariaUrl={`https://www.sefaria.org/Berakhot.${chapter}`} />
+                          sefariaUrl={`https://www.sefaria.org/Sukkah.${chapter}`} />
             <BranchHeader branch={yerushalamiBranch} author={yerushalmiAuthor} label="Yerushalmi"
-                          sefariaUrl={`https://www.sefaria.org/Jerusalem_Talmud_Berakhot.${chapter}`} />
+                          sefariaUrl={`https://www.sefaria.org/Jerusalem_Talmud_Sukkah.${chapter}`} />
           </div>
 
           <div className="space-y-2">

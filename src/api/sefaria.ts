@@ -94,16 +94,16 @@ export function flatten(t: SefariaText | null | undefined): string {
 // Lazily import cached Sefaria chapter files populated by `npm run fetch`.
 // Returns an empty object if the fetch hasn't been run yet.
 const sefariaModules = import.meta.glob<{ default: ChapterData }>(
-  '../../data/sefaria/berakhot-ch*.json'
+  '../../data/sefaria/sukkah-ch*.json'
 );
 
 export const sefariaAvailable = Object.keys(sefariaModules).length > 0;
 export const TOTAL_CHAPTERS = sefariaAvailable
   ? Object.keys(sefariaModules).length
-  : 9;
+  : 5;
 
 export async function loadChapter(n: number): Promise<ChapterData | null> {
-  const key = `../../data/sefaria/berakhot-ch${n}.json`;
+  const key = `../../data/sefaria/sukkah-ch${n}.json`;
   if (!(key in sefariaModules)) return null;
   const mod = await sefariaModules[key]();
   return mod.default;
@@ -142,13 +142,9 @@ export function yerushalmiAmoraForChapter(chapter: number): Author {
 export interface ChapterMeta { he: string; en: string; slug: string }
 
 export const CHAPTER_NAMES: Record<number, ChapterMeta> = {
-  1: { he: 'מֵאֵימָתַי',        en: 'From when',             slug: 'meimatai' },
-  2: { he: 'הָיָה קוֹרֵא',      en: 'One who reads',         slug: 'haya-korei' },
-  3: { he: 'מִי שֶּׁמֵתוֹ',     en: 'One whose dead',        slug: 'mi-shemeto' },
-  4: { he: 'תְּפִלַּת הַשַּׁחַר', en: 'Morning prayer',        slug: 'tefilat-hashachar' },
-  5: { he: 'אֵין עוֹמְדִין',     en: 'One may not stand',     slug: 'ein-omdin' },
-  6: { he: 'כֵּיצַד מְבָרְכִין', en: 'How one blesses',       slug: 'keitzad-mevarkhim' },
-  7: { he: 'שְּּלֹשָׁה שֶּׁאָכְלוּ', en: 'Three who ate',        slug: 'shlosha-sheakhlu' },
-  8: { he: 'אֵלּוּ דְבָרִים',    en: 'These are the matters', slug: 'elu-devarim' },
-  9: { he: 'הָרוֹאֶה',           en: 'One who sees',          slug: 'haroeh' },
+  1: { he: 'סוּכָּה',          en: 'The Sukkah',       slug: 'sukkah' },
+  2: { he: 'הַיָּשֵׁן',        en: 'One who sleeps',   slug: 'hayashen' },
+  3: { he: 'לוּלָב הַגָּזוּל', en: 'The stolen lulav', slug: 'lulav-hagazul' },
+  4: { he: 'לוּלָב וַעֲרָבָה', en: 'Lulav and willow', slug: 'lulav-vearavah' },
+  5: { he: 'הֶחָלִיל',         en: 'The flute',        slug: 'hechalil' },
 };

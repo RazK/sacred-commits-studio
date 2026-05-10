@@ -47,7 +47,7 @@ function buildLayers(ch: ChapterData, chapter: number): Layer[] {
       label: 'Mishna',
       textEn: flatten(ch.bavli?.text),
       textHe: flatten(ch.bavli?.he),
-      sefariaUrl: `https://www.sefaria.org/Berakhot.${chapter}`,
+      sefariaUrl: `https://www.sefaria.org/Sukkah.${chapter}`,
     },
     gemara ? {
       branchId: 'bavli',
@@ -55,7 +55,7 @@ function buildLayers(ch: ChapterData, chapter: number): Layer[] {
       label: 'Babylonian Talmud (Bavli) — Gemara',
       textEn: flatten(gemara.text),
       textHe: flatten(gemara.he),
-      sefariaUrl: `https://www.sefaria.org/Berakhot.${chapter}`,
+      sefariaUrl: `https://www.sefaria.org/Sukkah.${chapter}`,
     } : null,
     ch.yerushalmi ? {
       branchId: 'yerushalmi',
@@ -63,7 +63,7 @@ function buildLayers(ch: ChapterData, chapter: number): Layer[] {
       label: 'Jerusalem Talmud (Yerushalmi)',
       textEn: flatten(ch.yerushalmi.text),
       textHe: flatten(ch.yerushalmi.he),
-      sefariaUrl: `https://www.sefaria.org/Jerusalem_Talmud_Berakhot.${chapter}`,
+      sefariaUrl: `https://www.sefaria.org/Jerusalem_Talmud_Sukkah.${chapter}`,
     } : null,
     rashiC ? {
       branchId: 'rashi-commentary',
@@ -71,7 +71,7 @@ function buildLayers(ch: ChapterData, chapter: number): Layer[] {
       label: 'Rashi Commentary',
       textEn: flatten(rashiC.text),
       textHe: flatten(rashiC.he),
-      sefariaUrl: `https://www.sefaria.org/Rashi_on_Berakhot.${chapter}`,
+      sefariaUrl: `https://www.sefaria.org/Rashi_on_Sukkah.${chapter}`,
     } : null,
     tosafotC ? {
       branchId: 'tosafot-commentary',
@@ -79,7 +79,7 @@ function buildLayers(ch: ChapterData, chapter: number): Layer[] {
       label: 'Tosafot',
       textEn: flatten(tosafotC.text),
       textHe: flatten(tosafotC.he),
-      sefariaUrl: `https://www.sefaria.org/Tosafot_on_Berakhot.${chapter}`,
+      sefariaUrl: `https://www.sefaria.org/Tosafot_on_Sukkah.${chapter}`,
     } : null,
   ];
 
@@ -220,7 +220,7 @@ export default function ContributionView({
       onViewChange={onViewChange}
       lang={lang}
       onLangChange={onLangChange}
-      subtitle="Tractate Berakhot · מסכת ברכות"
+      subtitle="Tractate Sukkah · מסכת סוכה"
       info={`${layers.length} layers · Ch. ${chapter}/${TOTAL_CHAPTERS}`}
       sidebar={sidebar}
     >

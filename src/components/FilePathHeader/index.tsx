@@ -10,7 +10,7 @@ export function FilePathHeader({ chapter }: { chapter: number }) {
       <span className="font-mono text-sm text-gray-600 min-w-0 truncate">
         <span className="text-gray-400">talmud</span>
         <span className="text-gray-300"> / </span>
-        <span className="text-gray-400">berakhot</span>
+        <span className="text-gray-400">sukkah</span>
         <span className="text-gray-300"> / </span>
         <span className="text-gray-700 font-medium">
           chapter-{num}-{slug}.md
