@@ -66,12 +66,12 @@ async function main() {
   for (let chapter = 1; chapter <= SUKKAH_CHAPTERS; chapter++) {
     console.log(`Chapter ${chapter}...`);
     // Dual fetch strategy:
-    // - "Sukkah.N?commentary=1" returns the Talmud Bavli chapter with its
-    //   commentary array which includes the 'Gemara' entry (the scholarly discussion).
-    //   The main text (he/text) from this ref may be oddly structured or cumulative.
+    // - "Sukkah, Chapter N" uses Sefaria's alt-structure (chapter-based) ref for the
+    //   daf-indexed Bavli tractate. This returns the Gemara text + commentary array
+    //   which includes collectiveTitle.en === 'Gemara'.
     // - "Mishna Sukkah.N" returns the clean chapter-based Mishna text (he/text).
     // We merge: Mishna text as the base, Talmud commentary for the Gemara layer.
-    const talmudRef  = `Sukkah.${chapter}`;
+    const talmudRef  = `Sukkah, Chapter ${chapter}`;
     const mishnaRef  = `Mishna Sukkah.${chapter}`;
     const yerushalmiRef = `Jerusalem Talmud Sukkah.${chapter}`;
     try {
@@ -82,6 +82,12 @@ async function main() {
       await sleep(300);
       const yerushalmi = await fetchYerushalmiPassage(yerushalmiRef);
       await sleep(300);
+
+      // Log available commentary titles so we can verify Gemara is present
+      const commentaryTitles = (talmudData?.commentary ?? [])
+        .map(c => c.collectiveTitle?.en ?? c.he_title ?? '(no title)')
+        .join(', ');
+      console.log(`  Commentary titles for ch${chapter}: [${commentaryTitles || 'none'}]`);
 
       // Merge: clean Mishna text + Talmud commentary (Gemara, Rashi, Tosafot)
       const bavli = {
