@@ -65,18 +65,30 @@ async function main() {
 
   for (let chapter = 1; chapter <= SUKKAH_CHAPTERS; chapter++) {
     console.log(`Chapter ${chapter}...`);
-    // "Mishna Sukkah.N" = chapter-based Mishna reference; returns Mishna text
-    // with Gemara (and Rashi/Tosafot) as commentary entries.
-    // Plain "Sukkah.N" resolves to Talmud daf N, which is daf-based (Sukkah
-    // starts on daf 2a so daf 1 is empty and daf 2 = ch1 content — wrong).
-    const bavliRef = `Mishna Sukkah.${chapter}`;
+    // Dual fetch strategy:
+    // - "Sukkah.N?commentary=1" returns the Talmud Bavli chapter with its
+    //   commentary array which includes the 'Gemara' entry (the scholarly discussion).
+    //   The main text (he/text) from this ref may be oddly structured or cumulative.
+    // - "Mishna Sukkah.N" returns the clean chapter-based Mishna text (he/text).
+    // We merge: Mishna text as the base, Talmud commentary for the Gemara layer.
+    const talmudRef  = `Sukkah.${chapter}`;
+    const mishnaRef  = `Mishna Sukkah.${chapter}`;
     const yerushalmiRef = `Jerusalem Talmud Sukkah.${chapter}`;
     try {
-      const bavli = await fetchPassage(bavliRef);
+      const talmudData = await fetchPassage(talmudRef);
       // 300ms between requests — Sefaria is rate-limited, do not remove
+      await sleep(300);
+      const mishnaData = await fetchPassage(mishnaRef);
       await sleep(300);
       const yerushalmi = await fetchYerushalmiPassage(yerushalmiRef);
       await sleep(300);
+
+      // Merge: clean Mishna text + Talmud commentary (Gemara, Rashi, Tosafot)
+      const bavli = {
+        text:        mishnaData?.text ?? talmudData?.text,
+        he:          mishnaData?.he   ?? talmudData?.he,
+        commentary:  talmudData?.commentary ?? mishnaData?.commentary ?? [],
+      };
 
       const passage = { ref: `Sukkah.${chapter}`, chapter, bavli, yerushalmi };
       allPassages.push(passage);

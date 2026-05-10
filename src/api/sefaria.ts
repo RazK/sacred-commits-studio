@@ -81,12 +81,17 @@ export const branchById: Record<string, Branch> = Object.fromEntries(
 /** Recursively flatten Sefaria's nested text arrays and strip HTML tags. */
 export function flatten(t: SefariaText | null | undefined): string {
   if (!t) return '';
-  if (typeof t === 'string') return t.replace(/<[^>]*>/g, '').trim();
-  return (t as (string | string[])[])
-    .flatMap(item => (Array.isArray(item) ? item : [item]))
-    .map(s => (typeof s === 'string' ? s.replace(/<[^>]*>/g, '').trim() : ''))
-    .filter(Boolean)
-    .join('\n\n');
+  const parts: string[] = [];
+  function collect(node: unknown): void {
+    if (typeof node === 'string') {
+      const s = node.replace(/<[^>]*>/g, '').trim();
+      if (s) parts.push(s);
+    } else if (Array.isArray(node)) {
+      (node as unknown[]).forEach(collect);
+    }
+  }
+  collect(t);
+  return parts.join('\n\n');
 }
 
 // ─── Sefaria chapter cache ────────────────────────────────────────────────────
