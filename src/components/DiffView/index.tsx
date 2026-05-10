@@ -26,10 +26,18 @@ function stripNikud(s: string): string {
   return s.replace(/[֑-ׇ]/g, '');
 }
 
+// Strip punctuation so "והיבש," === "והיבש" in the diff
+function stripPunct(s: string): string {
+  return s.replace(/[.,;:!?–—'"'"״׃׀]/g, '');
+}
+
 function tokensEqual(a: string, b: string): boolean {
   if (a === b) return true;
+  const ca = stripPunct(a);
+  const cb = stripPunct(b);
+  if (ca === cb && ca !== '') return true;
   if (hasNikud(a) && hasNikud(b)) return false;
-  return stripNikud(a) === stripNikud(b);
+  return stripNikud(ca) === stripNikud(cb);
 }
 
 function wordDiff(left: string, right: string): { leftSegs: Seg[]; rightSegs: Seg[] } {
@@ -172,22 +180,22 @@ export default function DiffView({
   const yerushalmiAuthor  = yerushalmiAmoraForChapter(chapter);
   const rtl               = lang === 'he';
 
-  // Use the Bavli Gemara discussion (from commentary) vs the full Yerushalmi text.
-  // This is the true apples-to-apples: both are the scholarly Talmudic analysis
-  // of the same Mishna chapter. bavli.he contains the raw Mishna text but its
-  // structure from the live API varies by chapter (empty arrays, cumulative content),
-  // making it unreliable. The Gemara commentary is consistently structured.
-  // Collapse both into one block for a single LCS diff across the full text.
   const collapse = (t: SefariaText | null | undefined) =>
     flatten(t).split('\n\n').filter(Boolean).join(' ');
 
+  const GEMARA_TITLES = ['Gemara', 'Talmud Bavli', 'Talmud'];
+
+  const gemaraEntry = useMemo(() =>
+    chapterData?.bavli?.commentary?.find(c =>
+      GEMARA_TITLES.includes(c.collectiveTitle?.en ?? '')
+    ) ?? null,
+    [chapterData]);
+
   const leftText = useMemo(() => {
     if (!chapterData) return '';
-    const gemara = chapterData.bavli?.commentary?.find(c => c.collectiveTitle?.en === 'Gemara');
-    if (gemara) return collapse(rtl ? gemara.he : gemara.text);
-    // fallback to main text if no Gemara commentary available
+    if (gemaraEntry) return collapse(rtl ? gemaraEntry.he : gemaraEntry.text);
     return collapse(rtl ? chapterData.bavli?.he : chapterData.bavli?.text);
-  }, [chapterData, rtl]);
+  }, [chapterData, gemaraEntry, rtl]);
 
   const rightText = useMemo(() =>
     chapterData ? collapse(rtl ? chapterData.yerushalmi?.he : chapterData.yerushalmi?.text) : '',
@@ -256,7 +264,7 @@ export default function DiffView({
       onViewChange={onViewChange}
       lang={lang}
       onLangChange={onLangChange}
-      subtitle="Tractate Sukkah · Bavli vs. Yerushalmi — textual diff"
+      subtitle={gemaraEntry ? "Tractate Sukkah · Bavli Gemara vs. Yerushalmi" : "Tractate Sukkah · Mishna vs. Yerushalmi"}
       sidebar={sidebar}
     >
       {!sefariaAvailable ? (
@@ -278,15 +286,16 @@ export default function DiffView({
         <>
           {(deletions > 0 || insertions > 0) && (
             <div className="mb-3 flex items-center gap-3 font-mono text-xs text-gray-500">
-              <span className="text-red-600">−{deletions} Bavli-only</span>
-              <span className="text-green-600">+{insertions} Yerushalmi-only</span>
+              <span className="text-red-600">−{deletions} left-only</span>
+              <span className="text-green-600">+{insertions} right-only</span>
             </div>
           )}
 
           <FilePathHeader chapter={chapter} />
 
           <div className="grid grid-cols-2 gap-3 mb-3">
-            <BranchHeader branch={bavliBranch} author={bavliAuthor} label="Bavli — Gemara"
+            <BranchHeader branch={bavliBranch} author={bavliAuthor}
+                          label={gemaraEntry ? "Bavli — Gemara" : "Mishna (Bavli tradition)"}
                           sefariaUrl={`https://www.sefaria.org/Mishna_Sukkah.${chapter}`} />
             <BranchHeader branch={yerushalamiBranch} author={yerushalmiAuthor} label="Yerushalmi"
                           sefariaUrl={`https://www.sefaria.org/Jerusalem_Talmud_Sukkah.${chapter}`} />

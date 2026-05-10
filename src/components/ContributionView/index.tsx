@@ -36,7 +36,10 @@ function buildLayers(ch: ChapterData, chapter: number): Layer[] {
   const findCommentary = (title: string): Commentary | undefined =>
     ch.bavli?.commentary?.find(c => c.collectiveTitle?.en === title);
 
-  const gemara   = findCommentary('Gemara');
+  const GEMARA_TITLES = ['Gemara', 'Talmud Bavli', 'Talmud'];
+  const gemara = ch.bavli?.commentary?.find(c =>
+    GEMARA_TITLES.includes(c.collectiveTitle?.en ?? '')
+  );
   const rashiC   = findCommentary('Rashi');
   const tosafotC = findCommentary('Tosafot');
 
