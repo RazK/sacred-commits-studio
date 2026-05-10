@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
-  Author, Branch, ChapterData,
+  Author, Branch, ChapterData, SefariaText,
   branchById, flatten, loadChapter, sefariaAvailable,
   bavliAmoraForChapter, yerushalmiAmoraForChapter,
   TOTAL_CHAPTERS,
@@ -26,10 +26,18 @@ function stripNikud(s: string): string {
   return s.replace(/[֑-ׇ]/g, '');
 }
 
+// Strip punctuation so "והיבש," === "והיבש" in the diff
+function stripPunct(s: string): string {
+  return s.replace(/[.,;:!?–—'"'"״׃׀]/g, '');
+}
+
 function tokensEqual(a: string, b: string): boolean {
   if (a === b) return true;
+  const ca = stripPunct(a);
+  const cb = stripPunct(b);
+  if (ca === cb && ca !== '') return true;
   if (hasNikud(a) && hasNikud(b)) return false;
-  return stripNikud(a) === stripNikud(b);
+  return stripNikud(ca) === stripNikud(cb);
 }
 
 function wordDiff(left: string, right: string): { leftSegs: Seg[]; rightSegs: Seg[] } {
@@ -172,11 +180,25 @@ export default function DiffView({
   const yerushalmiAuthor  = yerushalmiAmoraForChapter(chapter);
   const rtl               = lang === 'he';
 
-  const leftText  = useMemo(() =>
-    chapterData ? flatten(rtl ? chapterData.bavli?.he : chapterData.bavli?.text) : '',
-    [chapterData, rtl]);
+  const collapse = (t: SefariaText | null | undefined) =>
+    flatten(t).split('\n\n').filter(Boolean).join(' ');
+
+  const GEMARA_TITLES = ['Gemara', 'Talmud Bavli', 'Talmud'];
+
+  const gemaraEntry = useMemo(() =>
+    chapterData?.bavli?.commentary?.find(c =>
+      GEMARA_TITLES.includes(c.collectiveTitle?.en ?? '')
+    ) ?? null,
+    [chapterData]);
+
+  const leftText = useMemo(() => {
+    if (!chapterData) return '';
+    if (gemaraEntry) return collapse(rtl ? gemaraEntry.he : gemaraEntry.text);
+    return collapse(rtl ? chapterData.bavli?.he : chapterData.bavli?.text);
+  }, [chapterData, gemaraEntry, rtl]);
+
   const rightText = useMemo(() =>
-    chapterData ? flatten(rtl ? chapterData.yerushalmi?.he : chapterData.yerushalmi?.text) : '',
+    chapterData ? collapse(rtl ? chapterData.yerushalmi?.he : chapterData.yerushalmi?.text) : '',
     [chapterData, rtl]);
 
   const pairs = useMemo(() =>
@@ -242,7 +264,7 @@ export default function DiffView({
       onViewChange={onViewChange}
       lang={lang}
       onLangChange={onLangChange}
-      subtitle="Bavli vs. Yerushalmi — textual diff"
+      subtitle={gemaraEntry ? "Tractate Sukkah · Bavli Gemara vs. Yerushalmi" : "Tractate Sukkah · Mishna vs. Yerushalmi"}
       sidebar={sidebar}
     >
       {!sefariaAvailable ? (
@@ -264,18 +286,19 @@ export default function DiffView({
         <>
           {(deletions > 0 || insertions > 0) && (
             <div className="mb-3 flex items-center gap-3 font-mono text-xs text-gray-500">
-              <span className="text-red-600">−{deletions} Bavli-only</span>
-              <span className="text-green-600">+{insertions} Yerushalmi-only</span>
+              <span className="text-red-600">−{deletions} left-only</span>
+              <span className="text-green-600">+{insertions} right-only</span>
             </div>
           )}
 
           <FilePathHeader chapter={chapter} />
 
           <div className="grid grid-cols-2 gap-3 mb-3">
-            <BranchHeader branch={bavliBranch} author={bavliAuthor} label="Babylonian Talmud"
-                          sefariaUrl={`https://www.sefaria.org/Berakhot.${chapter}`} />
-            <BranchHeader branch={yerushalamiBranch} author={yerushalmiAuthor} label="Jerusalem Talmud"
-                          sefariaUrl={`https://www.sefaria.org/Jerusalem_Talmud_Berakhot.${chapter}`} />
+            <BranchHeader branch={bavliBranch} author={bavliAuthor}
+                          label={gemaraEntry ? "Bavli — Gemara" : "Mishna (Bavli tradition)"}
+                          sefariaUrl={`https://www.sefaria.org/Mishna_Sukkah.${chapter}`} />
+            <BranchHeader branch={yerushalamiBranch} author={yerushalmiAuthor} label="Yerushalmi"
+                          sefariaUrl={`https://www.sefaria.org/Jerusalem_Talmud_Sukkah.${chapter}`} />
           </div>
 
           <div className="space-y-2">

@@ -13,8 +13,8 @@ const path = require('path');
 const BASE_URL = 'https://www.sefaria.org/api';
 const OUTPUT_DIR = path.join(__dirname, '../data/sefaria');
 
-// Tractate Berakhot has 9 chapters
-const BERAKHOT_CHAPTERS = 9;
+// Tractate Sukkah has 5 chapters
+const SUKKAH_CHAPTERS = 5;
 
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -33,22 +33,21 @@ async function fetchPassage(ref) {
   return fetchJSON(url);
 }
 
-async function fetchYerushalmiPassage(ref) {
-  const yerushalmiRef = ref.replace('Berakhot', 'Jerusalem Talmud Berakhot');
+async function fetchYerushalmiPassage(yerushalmiRef) {
   const encoded = encodeURIComponent(yerushalmiRef);
   const url = `${BASE_URL}/texts/${encoded}?context=0&language=both`;
   console.log(`  Fetching Yerushalmi: ${yerushalmiRef}`);
   try {
     return await fetchJSON(url);
   } catch (e) {
-    console.warn(`  No Yerushalmi data for ${ref}: ${e.message}`);
+    console.warn(`  No Yerushalmi data for ${yerushalmiRef}: ${e.message}`);
     return null;
   }
 }
 
 async function fetchIndex() {
-  const url = `${BASE_URL}/index/Berakhot`;
-  console.log('Fetching Berakhot index...');
+  const url = `${BASE_URL}/index/Sukkah`;
+  console.log('Fetching Sukkah index...');
   return fetchJSON(url);
 }
 
@@ -57,38 +56,61 @@ async function main() {
 
   const index = await fetchIndex();
   fs.writeFileSync(
-    path.join(OUTPUT_DIR, 'berakhot-index.json'),
+    path.join(OUTPUT_DIR, 'sukkah-index.json'),
     JSON.stringify(index, null, 2)
   );
-  console.log('Saved berakhot-index.json\n');
+  console.log('Saved sukkah-index.json\n');
 
   const allPassages = [];
 
-  for (let chapter = 1; chapter <= BERAKHOT_CHAPTERS; chapter++) {
+  for (let chapter = 1; chapter <= SUKKAH_CHAPTERS; chapter++) {
     console.log(`Chapter ${chapter}...`);
-    const ref = `Berakhot.${chapter}`;
+    // Dual fetch strategy:
+    // - "Sukkah, Chapter N" uses Sefaria's alt-structure (chapter-based) ref for the
+    //   daf-indexed Bavli tractate. This returns the Gemara text + commentary array
+    //   which includes collectiveTitle.en === 'Gemara'.
+    // - "Mishna Sukkah.N" returns the clean chapter-based Mishna text (he/text).
+    // We merge: Mishna text as the base, Talmud commentary for the Gemara layer.
+    const talmudRef  = `Sukkah, Chapter ${chapter}`;
+    const mishnaRef  = `Mishna Sukkah.${chapter}`;
+    const yerushalmiRef = `Jerusalem Talmud Sukkah.${chapter}`;
     try {
-      const bavli = await fetchPassage(ref);
+      const talmudData = await fetchPassage(talmudRef);
       // 300ms between requests — Sefaria is rate-limited, do not remove
       await sleep(300);
-      const yerushalmi = await fetchYerushalmiPassage(ref);
+      const mishnaData = await fetchPassage(mishnaRef);
+      await sleep(300);
+      const yerushalmi = await fetchYerushalmiPassage(yerushalmiRef);
       await sleep(300);
 
-      const passage = { ref, chapter, bavli, yerushalmi };
+      // Log available commentary titles so we can verify Gemara is present
+      const commentaryTitles = (talmudData?.commentary ?? [])
+        .map(c => c.collectiveTitle?.en ?? c.he_title ?? '(no title)')
+        .join(', ');
+      console.log(`  Commentary titles for ch${chapter}: [${commentaryTitles || 'none'}]`);
+
+      // Merge: clean Mishna text + Talmud commentary (Gemara, Rashi, Tosafot)
+      const bavli = {
+        text:        mishnaData?.text ?? talmudData?.text,
+        he:          mishnaData?.he   ?? talmudData?.he,
+        commentary:  talmudData?.commentary ?? mishnaData?.commentary ?? [],
+      };
+
+      const passage = { ref: `Sukkah.${chapter}`, chapter, bavli, yerushalmi };
       allPassages.push(passage);
 
       fs.writeFileSync(
-        path.join(OUTPUT_DIR, `berakhot-ch${chapter}.json`),
+        path.join(OUTPUT_DIR, `sukkah-ch${chapter}.json`),
         JSON.stringify(passage, null, 2)
       );
-      console.log(`  Saved berakhot-ch${chapter}.json`);
+      console.log(`  Saved sukkah-ch${chapter}.json`);
     } catch (e) {
       console.error(`  Error fetching chapter ${chapter}: ${e.message}`);
     }
   }
 
   fs.writeFileSync(
-    path.join(OUTPUT_DIR, 'berakhot-all.json'),
+    path.join(OUTPUT_DIR, 'sukkah-all.json'),
     JSON.stringify(allPassages, null, 2)
   );
 
