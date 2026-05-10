@@ -33,15 +33,14 @@ async function fetchPassage(ref) {
   return fetchJSON(url);
 }
 
-async function fetchYerushalmiPassage(ref) {
-  const yerushalmiRef = ref.replace('Sukkah', 'Jerusalem Talmud Sukkah');
+async function fetchYerushalmiPassage(yerushalmiRef) {
   const encoded = encodeURIComponent(yerushalmiRef);
   const url = `${BASE_URL}/texts/${encoded}?context=0&language=both`;
   console.log(`  Fetching Yerushalmi: ${yerushalmiRef}`);
   try {
     return await fetchJSON(url);
   } catch (e) {
-    console.warn(`  No Yerushalmi data for ${ref}: ${e.message}`);
+    console.warn(`  No Yerushalmi data for ${yerushalmiRef}: ${e.message}`);
     return null;
   }
 }
@@ -66,15 +65,20 @@ async function main() {
 
   for (let chapter = 1; chapter <= SUKKAH_CHAPTERS; chapter++) {
     console.log(`Chapter ${chapter}...`);
-    const ref = `Sukkah.${chapter}`;
+    // "Mishna Sukkah.N" = chapter-based Mishna reference; returns Mishna text
+    // with Gemara (and Rashi/Tosafot) as commentary entries.
+    // Plain "Sukkah.N" resolves to Talmud daf N, which is daf-based (Sukkah
+    // starts on daf 2a so daf 1 is empty and daf 2 = ch1 content — wrong).
+    const bavliRef = `Mishna Sukkah.${chapter}`;
+    const yerushalmiRef = `Jerusalem Talmud Sukkah.${chapter}`;
     try {
-      const bavli = await fetchPassage(ref);
+      const bavli = await fetchPassage(bavliRef);
       // 300ms between requests — Sefaria is rate-limited, do not remove
       await sleep(300);
-      const yerushalmi = await fetchYerushalmiPassage(ref);
+      const yerushalmi = await fetchYerushalmiPassage(yerushalmiRef);
       await sleep(300);
 
-      const passage = { ref, chapter, bavli, yerushalmi };
+      const passage = { ref: `Sukkah.${chapter}`, chapter, bavli, yerushalmi };
       allPassages.push(passage);
 
       fs.writeFileSync(

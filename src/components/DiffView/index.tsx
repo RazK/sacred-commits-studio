@@ -287,7 +287,7 @@ export default function DiffView({
 
           <div className="grid grid-cols-2 gap-3 mb-3">
             <BranchHeader branch={bavliBranch} author={bavliAuthor} label="Bavli — Gemara"
-                          sefariaUrl={`https://www.sefaria.org/Sukkah.${chapter}`} />
+                          sefariaUrl={`https://www.sefaria.org/Mishna_Sukkah.${chapter}`} />
             <BranchHeader branch={yerushalamiBranch} author={yerushalmiAuthor} label="Yerushalmi"
                           sefariaUrl={`https://www.sefaria.org/Jerusalem_Talmud_Sukkah.${chapter}`} />
           </div>

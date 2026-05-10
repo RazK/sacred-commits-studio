@@ -47,7 +47,7 @@ function buildLayers(ch: ChapterData, chapter: number): Layer[] {
       label: 'Mishna',
       textEn: flatten(ch.bavli?.text),
       textHe: flatten(ch.bavli?.he),
-      sefariaUrl: `https://www.sefaria.org/Sukkah.${chapter}`,
+      sefariaUrl: `https://www.sefaria.org/Mishna_Sukkah.${chapter}`,
     },
     gemara ? {
       branchId: 'bavli',
@@ -55,7 +55,7 @@ function buildLayers(ch: ChapterData, chapter: number): Layer[] {
       label: 'Babylonian Talmud (Bavli) — Gemara',
       textEn: flatten(gemara.text),
       textHe: flatten(gemara.he),
-      sefariaUrl: `https://www.sefaria.org/Sukkah.${chapter}`,
+      sefariaUrl: `https://www.sefaria.org/Mishna_Sukkah.${chapter}`,
     } : null,
     ch.yerushalmi ? {
       branchId: 'yerushalmi',
